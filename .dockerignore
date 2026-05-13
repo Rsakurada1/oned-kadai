@@ -1,0 +1,10 @@
+.git
+.next
+node_modules
+coverage
+playwright-report
+test-results
+src/e2e/*-snapshots
+.env*.local
+npm-debug.log*
+

@@ -13,31 +13,33 @@ describe("GitHub response cache", () => {
     clearGitHubResponseCache();
   });
 
-  it("returns fresh cached responses before revalidation expires", () => {
+  it("returns fresh cached responses before revalidation expires", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-05-13T00:00:00.000Z"));
 
     const key = createGitHubCacheKey(new URL("https://api.github.com/test"));
-    setCachedGitHubResponse(
+    await setCachedGitHubResponse(
       key,
       { data: { ok: true }, rateLimit: null },
       60,
       300,
     );
 
-    expect(getCachedGitHubResponse<{ ok: boolean }>(key, "fresh")).toEqual({
+    await expect(
+      getCachedGitHubResponse<{ ok: boolean }>(key, "fresh"),
+    ).resolves.toEqual({
       data: { ok: true },
       rateLimit: null,
       cacheStatus: "fresh",
     });
   });
 
-  it("returns stale cached responses during the stale window", () => {
+  it("returns stale cached responses during the stale window", async () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-05-13T00:00:00.000Z"));
 
     const key = createGitHubCacheKey(new URL("https://api.github.com/test"));
-    setCachedGitHubResponse(
+    await setCachedGitHubResponse(
       key,
       { data: { ok: true }, rateLimit: null },
       60,
@@ -46,12 +48,15 @@ describe("GitHub response cache", () => {
 
     vi.setSystemTime(new Date("2026-05-13T00:02:00.000Z"));
 
-    expect(getCachedGitHubResponse<{ ok: boolean }>(key, "fresh")).toBeNull();
-    expect(getCachedGitHubResponse<{ ok: boolean }>(key, "stale")).toEqual({
+    await expect(
+      getCachedGitHubResponse<{ ok: boolean }>(key, "fresh"),
+    ).resolves.toBeNull();
+    await expect(
+      getCachedGitHubResponse<{ ok: boolean }>(key, "stale"),
+    ).resolves.toEqual({
       data: { ok: true },
       rateLimit: null,
       cacheStatus: "stale",
     });
   });
 });
-

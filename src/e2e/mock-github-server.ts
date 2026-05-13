@@ -30,6 +30,26 @@ const server = createServer((request, response) => {
     return;
   }
 
+  if (url.pathname === "/rate_limit") {
+    sendJson(response, 200, {
+      resources: {
+        search: {
+          limit: 60,
+          remaining: 41,
+          reset: 1710000000,
+          used: 19,
+        },
+      },
+      rate: {
+        limit: 60,
+        remaining: 41,
+        reset: 1710000000,
+        used: 19,
+      },
+    });
+    return;
+  }
+
   if (url.pathname.startsWith("/repos/")) {
     handleRepositoryDetail(url, response);
     return;

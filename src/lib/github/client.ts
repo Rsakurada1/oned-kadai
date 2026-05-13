@@ -1,6 +1,12 @@
 import "server-only";
 
 import { logError, logInfo, logWarn } from "@/lib/observability/logger";
+import {
+  recordGitHubCacheEvent,
+  recordGitHubRequest,
+  withSpan,
+} from "@/lib/observability/telemetry";
+import type { Attributes } from "@opentelemetry/api";
 import { createGitHubHeaders } from "./headers";
 import { GitHubApiError } from "./errors";
 import {
@@ -33,11 +39,34 @@ export async function githubFetch<T>(
   path: string,
   options: GitHubFetchOptions,
 ): Promise<GitHubResponse<T>> {
+  return withSpan(
+    "github.fetch",
+    {
+      "github.path": path,
+      "github.cache.revalidate_seconds": options.revalidate,
+    },
+    (span) => githubFetchWithSpan<T>(path, options, span),
+  );
+}
+
+async function githubFetchWithSpan<T>(
+  path: string,
+  options: GitHubFetchOptions,
+  span: import("@opentelemetry/api").Span,
+): Promise<GitHubResponse<T>> {
   const url = createGitHubUrl(path, options.searchParams);
   const cacheKey = createGitHubCacheKey(url);
-  const cachedResponse = getCachedGitHubResponse<T>(cacheKey, "fresh");
+  const cachedResponse = await getCachedGitHubResponse<T>(cacheKey, "fresh");
 
   if (cachedResponse) {
+    span.setAttributes({
+      "github.cache.status": cachedResponse.cacheStatus,
+      "github.request.url": sanitizeUrlForTelemetry(url),
+    });
+    recordGitHubCacheEvent({
+      "github.path": path,
+      "github.cache.status": cachedResponse.cacheStatus,
+    });
     logInfo("github_api_cache_hit", {
       path,
       cacheStatus: cachedResponse.cacheStatus,
@@ -59,6 +88,22 @@ export async function githubFetch<T>(
   });
   const durationMs = Math.round(performance.now() - startedAt);
   const rateLimit = parseGitHubRateLimitHeaders(response.headers);
+  setSpanAttributes(span, {
+    "github.request.url": sanitizeUrlForTelemetry(url),
+    "github.response.status": response.status,
+    "github.request.duration_ms": durationMs,
+    "github.rate_limit.remaining": rateLimit?.remaining,
+    "github.rate_limit.resource": rateLimit?.resource,
+    "github.request_id": response.headers.get("x-github-request-id"),
+  });
+  recordGitHubRequest(
+    {
+      "github.path": path,
+      "github.response.status": response.status,
+      "github.cache.status": "network",
+    },
+    durationMs,
+  );
   const logFields = {
     path,
     status: response.status,
@@ -68,9 +113,14 @@ export async function githubFetch<T>(
   };
 
   if (!response.ok) {
-    const staleResponse = getCachedGitHubResponse<T>(cacheKey, "stale");
+    const staleResponse = await getCachedGitHubResponse<T>(cacheKey, "stale");
 
     if (staleResponse && shouldServeStaleResponse(response.status)) {
+      span.setAttribute("github.cache.status", staleResponse.cacheStatus);
+      recordGitHubCacheEvent({
+        "github.path": path,
+        "github.cache.status": staleResponse.cacheStatus,
+      });
       logWarn("github_api_stale_cache_served", {
         ...logFields,
         cacheStatus: staleResponse.cacheStatus,
@@ -95,7 +145,7 @@ export async function githubFetch<T>(
     cacheStatus: "network",
   };
 
-  setCachedGitHubResponse(
+  await setCachedGitHubResponse(
     cacheKey,
     parsedResponse,
     options.revalidate,
@@ -124,6 +174,27 @@ function createGitHubUrl(
 
 function shouldServeStaleResponse(status: number): boolean {
   return status === 403 || status === 429 || status >= 500;
+}
+
+function sanitizeUrlForTelemetry(url: URL): string {
+  const sanitized = new URL(url);
+  sanitized.searchParams.delete("access_token");
+  return sanitized.toString();
+}
+
+function setSpanAttributes(
+  span: import("@opentelemetry/api").Span,
+  attributes: Record<string, null | number | string | undefined>,
+) {
+  const compactAttributes: Attributes = {};
+
+  for (const [key, value] of Object.entries(attributes)) {
+    if (value != null) {
+      compactAttributes[key] = value;
+    }
+  }
+
+  span.setAttributes(compactAttributes);
 }
 
 async function readErrorMessage(response: Response): Promise<string> {

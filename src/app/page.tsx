@@ -13,6 +13,7 @@ import {
 } from "@/features/repositories/model/search-params";
 import { searchRepositories } from "@/features/repositories/services/search-repositories";
 import { classifyGitHubError } from "@/lib/github/errors";
+import { getGitHubSearchRateLimit } from "@/lib/github/get-rate-limit";
 
 type HomePageProps = {
   searchParams: Promise<RawSearchParams>;
@@ -45,16 +46,20 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
 async function renderSearchResult(search: RepositorySearchParams) {
   try {
-    const result = await searchRepositories({
-      q: search.q,
-      language: search.language,
-      topic: search.topic,
-      minStars: search.minStars,
-      sort: search.sort,
-      order: search.order,
-      page: search.page,
-      perPage: PER_PAGE,
-    });
+    const [result, searchRateLimit] = await Promise.all([
+      searchRepositories({
+        q: search.q,
+        language: search.language,
+        topic: search.topic,
+        minStars: search.minStars,
+        sort: search.sort,
+        order: search.order,
+        page: search.page,
+        perPage: PER_PAGE,
+      }),
+      getGitHubSearchRateLimit(),
+    ]);
+    const rateLimit = searchRateLimit ?? result.rateLimit;
 
     if (result.items.length === 0) {
       return (
@@ -69,7 +74,7 @@ async function renderSearchResult(search: RepositorySearchParams) {
             q={search.q}
             topic={search.topic}
           />
-          <RateLimitStatus rateLimit={result.rateLimit} />
+          <RateLimitStatus rateLimit={rateLimit} />
         </>
       );
     }
@@ -85,7 +90,7 @@ async function renderSearchResult(search: RepositorySearchParams) {
           search={{ ...search, page: result.page }}
           totalCount={result.totalCount}
         />
-        <RateLimitStatus rateLimit={result.rateLimit} />
+        <RateLimitStatus rateLimit={rateLimit} />
         <Pagination
           currentPage={result.page}
           search={{ ...search, page: result.page }}

@@ -1,4 +1,5 @@
 import { sendStructuredLog } from "./sink";
+import { getActiveTraceFields } from "./telemetry";
 
 type LogLevel = "info" | "warn" | "error";
 
@@ -21,6 +22,7 @@ function writeLog(level: LogLevel, event: string, fields: LogFields) {
     timestamp: new Date().toISOString(),
     level,
     event,
+    ...getActiveTraceFields(),
     ...fields,
   };
 

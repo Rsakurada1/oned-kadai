@@ -1,4 +1,7 @@
 import type { GitHubRateLimit } from "./rate-limit";
+import { logWarn } from "@/lib/observability/logger";
+import Redis from "ioredis";
+import { createHash } from "node:crypto";
 
 export type GitHubCacheStatus = "network" | "fresh" | "stale";
 
@@ -18,19 +21,23 @@ type CacheEntry = {
 
 const MAX_CACHE_ENTRIES = 200;
 const responseCache = new Map<string, CacheEntry>();
+let redisClient: Redis | null | undefined;
 
 export function createGitHubCacheKey(url: URL): string {
-  return JSON.stringify({
+  const source = JSON.stringify({
     url: url.toString(),
     authenticated: Boolean(process.env.GITHUB_TOKEN),
   });
+
+  return `github-response:${createHash("sha256").update(source).digest("hex")}`;
 }
 
-export function getCachedGitHubResponse<T>(
+export async function getCachedGitHubResponse<T>(
   cacheKey: string,
   cacheStatus: Exclude<GitHubCacheStatus, "network">,
-): CachedGitHubResponse<T> | null {
-  const entry = responseCache.get(cacheKey);
+): Promise<CachedGitHubResponse<T> | null> {
+  const entry =
+    responseCache.get(cacheKey) ?? (await getSharedCacheEntry(cacheKey));
   if (!entry) {
     return null;
   }
@@ -54,7 +61,7 @@ export function getCachedGitHubResponse<T>(
   };
 }
 
-export function setCachedGitHubResponse<T>(
+export async function setCachedGitHubResponse<T>(
   cacheKey: string,
   response: Pick<CachedGitHubResponse<T>, "data" | "rateLimit">,
   revalidateSeconds: number,
@@ -63,13 +70,20 @@ export function setCachedGitHubResponse<T>(
   evictOldestEntries();
 
   const now = Date.now();
-  responseCache.set(cacheKey, {
+  const entry = {
     data: response.data,
     rateLimit: response.rateLimit,
     freshUntil: now + revalidateSeconds * 1_000,
     staleUntil: now + (revalidateSeconds + staleWhileRevalidateSeconds) * 1_000,
     storedAt: now,
-  });
+  };
+
+  responseCache.set(cacheKey, entry);
+  await setSharedCacheEntry(
+    cacheKey,
+    entry,
+    revalidateSeconds + staleWhileRevalidateSeconds,
+  );
 }
 
 export function clearGitHubResponseCache() {
@@ -90,3 +104,70 @@ function evictOldestEntries() {
   }
 }
 
+async function getSharedCacheEntry(
+  cacheKey: string,
+): Promise<CacheEntry | null> {
+  const redis = getRedisClient();
+  if (!redis) {
+    return null;
+  }
+
+  try {
+    const value = await redis.get(cacheKey);
+    if (!value) {
+      return null;
+    }
+
+    const entry = JSON.parse(value) as CacheEntry;
+    responseCache.set(cacheKey, entry);
+    return entry;
+  } catch (error) {
+    logWarn("shared_cache_read_failed", {
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return null;
+  }
+}
+
+async function setSharedCacheEntry(
+  cacheKey: string,
+  entry: CacheEntry,
+  ttlSeconds: number,
+) {
+  const redis = getRedisClient();
+  if (!redis) {
+    return;
+  }
+
+  try {
+    await redis.set(cacheKey, JSON.stringify(entry), "EX", ttlSeconds);
+  } catch (error) {
+    logWarn("shared_cache_write_failed", {
+      message: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
+
+function getRedisClient(): Redis | null {
+  if (redisClient !== undefined) {
+    return redisClient;
+  }
+
+  const url = process.env.SHARED_CACHE_REDIS_URL ?? process.env.REDIS_URL;
+  if (!url) {
+    redisClient = null;
+    return redisClient;
+  }
+
+  redisClient = new Redis(url, {
+    enableOfflineQueue: false,
+    maxRetriesPerRequest: 1,
+  });
+  redisClient.on("error", (error) => {
+    logWarn("shared_cache_connection_error", {
+      message: error.message,
+    });
+  });
+
+  return redisClient;
+}

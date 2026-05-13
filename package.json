@@ -9,9 +9,14 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:visual": "cross-env VISUAL_SNAPSHOT=1 playwright test src/e2e/visual-snapshot.spec.ts",
+    "test:visual:update": "cross-env VISUAL_SNAPSHOT=1 playwright test src/e2e/visual-snapshot.spec.ts --update-snapshots"
   },
   "dependencies": {
+    "@opentelemetry/api": "^1.9.1",
+    "@vercel/otel": "^2.1.2",
+    "ioredis": "^5.10.1",
     "next": "16.2.6",
     "react": "19.2.6",
     "react-dom": "19.2.6"
@@ -27,6 +32,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
+    "cross-env": "^10.1.0",
     "eslint": "^9.39.1",
     "eslint-config-next": "16.2.6",
     "jsdom": "^27.2.0",

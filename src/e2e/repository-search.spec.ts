@@ -21,6 +21,7 @@ test("searches repositories and navigates to detail page", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "GitHub API 残量" }),
   ).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText("41 / 60 回")).toBeVisible();
 
   const repositoryLink = page.getByRole("link", { name: "vercel/next.js" });
   await repositoryLink.scrollIntoViewIfNeeded();
