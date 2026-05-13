@@ -5,7 +5,7 @@ import {
   createGitHubCacheKey,
   getCachedGitHubResponse,
   setCachedGitHubResponse,
-} from "./response-cache";
+} from "../response-cache";
 
 describe("GitHub response cache", () => {
   afterEach(() => {

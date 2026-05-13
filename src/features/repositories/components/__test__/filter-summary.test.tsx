@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { FilterSummary } from "./filter-summary";
+import { FilterSummary } from "../filter-summary";
 
 describe("FilterSummary", () => {
   it("renders active filters with remove links and reset", () => {
@@ -55,4 +55,3 @@ describe("FilterSummary", () => {
     expect(container).toBeEmptyDOMElement();
   });
 });
-

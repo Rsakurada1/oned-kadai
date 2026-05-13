@@ -6,7 +6,7 @@ import {
   normalizePage,
   normalizeSort,
   parseSearchParams,
-} from "./search-params";
+} from "../search-params";
 
 describe("parseSearchParams", () => {
   it("trims q and normalizes page", () => {

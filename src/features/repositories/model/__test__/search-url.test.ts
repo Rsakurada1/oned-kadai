@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { createRepositorySearchUrl } from "./search-url";
+import { createRepositorySearchUrl } from "../search-url";
 
 describe("createRepositorySearchUrl", () => {
   it("preserves advanced filters in the URL", () => {

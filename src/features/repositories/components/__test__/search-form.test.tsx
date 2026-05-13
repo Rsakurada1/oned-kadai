@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { SearchForm } from "./search-form";
+import { SearchForm } from "../search-form";
 
 describe("SearchForm", () => {
   it("renders an accessible native GET search form", () => {

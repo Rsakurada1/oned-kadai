@@ -4,7 +4,7 @@ import {
   githubRepositoryResponse,
   githubRepositoryWithoutSubscribersResponse,
 } from "@/test/fixtures/github-repository-response";
-import { toRepositoryDetail, toRepositoryListItem } from "./repository-mapper";
+import { toRepositoryDetail, toRepositoryListItem } from "../repository-mapper";
 
 describe("toRepositoryListItem", () => {
   it("maps GitHub repository fields for list display", () => {
@@ -32,4 +32,3 @@ describe("toRepositoryDetail", () => {
     );
   });
 });
-

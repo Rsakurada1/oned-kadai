@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { classifyGitHubError, GitHubApiError } from "./errors";
+import { classifyGitHubError, GitHubApiError } from "../errors";
 
 describe("classifyGitHubError", () => {
   it("classifies 422 as validation", () => {
@@ -28,4 +28,3 @@ describe("classifyGitHubError", () => {
     expect(classifyGitHubError(new Error("boom")).kind).toBe("unexpected");
   });
 });
-

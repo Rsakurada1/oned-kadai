@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { RateLimitStatus } from "./rate-limit-status";
+import { RateLimitStatus } from "../rate-limit-status";
 
 describe("RateLimitStatus", () => {
   it("renders GitHub API rate limit metadata", () => {
@@ -34,4 +34,3 @@ describe("RateLimitStatus", () => {
     expect(container).toBeEmptyDOMElement();
   });
 });
-

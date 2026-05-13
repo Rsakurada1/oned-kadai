@@ -10,8 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "test:visual": "cross-env VISUAL_SNAPSHOT=1 playwright test src/e2e/visual-snapshot.spec.ts",
-    "test:visual:update": "cross-env VISUAL_SNAPSHOT=1 playwright test src/e2e/visual-snapshot.spec.ts --update-snapshots"
+    "test:visual": "cross-env VISUAL_SNAPSHOT=1 playwright test src/e2e/__test__/visual-snapshot.spec.ts",
+    "test:visual:update": "cross-env VISUAL_SNAPSHOT=1 playwright test src/e2e/__test__/visual-snapshot.spec.ts --update-snapshots"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.1",

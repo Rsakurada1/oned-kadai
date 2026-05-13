@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { Pagination } from "./pagination";
+import { Pagination } from "../pagination";
 
 describe("Pagination", () => {
   it("renders previous and next links with q preserved", () => {

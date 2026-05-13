@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { parseGitHubRateLimitHeaders } from "./rate-limit";
+import { parseGitHubRateLimitHeaders } from "../rate-limit";
 
 describe("parseGitHubRateLimitHeaders", () => {
   it("parses GitHub rate limit headers", () => {
@@ -27,4 +27,3 @@ describe("parseGitHubRateLimitHeaders", () => {
     expect(parseGitHubRateLimitHeaders(new Headers())).toBeNull();
   });
 });
-

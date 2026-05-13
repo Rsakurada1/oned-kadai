@@ -2,8 +2,8 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { githubRepositoryResponse } from "@/test/fixtures/github-repository-response";
-import { toRepositoryDetail } from "../model/repository-mapper";
-import { RepositoryDetail } from "./repository-detail";
+import { toRepositoryDetail } from "../../model/repository-mapper";
+import { RepositoryDetail } from "../repository-detail";
 
 describe("RepositoryDetail", () => {
   it("renders repository details and watcher count from subscribers", () => {
@@ -25,4 +25,3 @@ describe("RepositoryDetail", () => {
     ).toHaveAttribute("href", "/?q=next&page=1");
   });
 });
-

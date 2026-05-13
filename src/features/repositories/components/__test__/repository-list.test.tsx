@@ -2,8 +2,8 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { githubSearchResponse } from "@/test/fixtures/github-search-response";
-import { toRepositoryListItem } from "../model/repository-mapper";
-import { RepositoryList } from "./repository-list";
+import { toRepositoryListItem } from "../../model/repository-mapper";
+import { RepositoryList } from "../repository-list";
 
 describe("RepositoryList", () => {
   it("renders repositories with detail links and result count", () => {

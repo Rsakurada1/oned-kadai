@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import type { ClassifiedGitHubError } from "@/lib/github/errors";
-import { ErrorMessage } from "./error-message";
+import { ErrorMessage } from "../error-message";
 
 describe("ErrorMessage", () => {
   it("renders an alert with retry guidance", () => {
@@ -22,4 +22,3 @@ describe("ErrorMessage", () => {
     expect(screen.getByText(/再試行/)).toBeInTheDocument();
   });
 });
-

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildRepositorySearchQuery } from "./search-query";
+import { buildRepositorySearchQuery } from "../search-query";
 
 describe("buildRepositorySearchQuery", () => {
   it("adds a language qualifier", () => {
