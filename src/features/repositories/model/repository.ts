@@ -8,6 +8,7 @@ export type RepositoryListItem = {
   ownerAvatarUrl: string;
   description: string | null;
   language: string | null;
+  updatedAt: string | null;
   stars: number;
   forks: number;
   openIssues: number;

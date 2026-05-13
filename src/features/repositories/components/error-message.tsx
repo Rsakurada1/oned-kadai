@@ -7,9 +7,18 @@ type ErrorMessageProps = {
 
 export function ErrorMessage({ error }: ErrorMessageProps) {
   return (
-    <section className="error-message" role="alert">
-      <h2>{error.title}</h2>
+    <section
+      aria-labelledby="search-error-heading"
+      className="error-message"
+      role="alert"
+    >
+      <h2 id="search-error-heading" tabIndex={-1}>
+        {error.title}
+      </h2>
       <p>{error.message}</p>
+      <p className="error-message__action">
+        条件を緩めるか、少し時間を置いてから再検索してください。
+      </p>
       <RateLimitStatus rateLimit={error.rateLimit} />
     </section>
   );

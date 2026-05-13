@@ -27,21 +27,30 @@ test("search results have no serious accessibility violations", async ({
 test("search results render a non-empty responsive viewport", async ({
   page,
 }) => {
-  await page.goto(searchUrl);
-  await expect(
-    page.getByRole("heading", { name: "検索結果" }),
-  ).toBeVisible({ timeout: 15_000 });
+  for (const viewport of [
+    { width: 360, height: 740 },
+    { width: 768, height: 900 },
+    { width: 1440, height: 1000 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto(searchUrl);
+    await expect(
+      page.getByRole("heading", { name: "検索結果" }),
+    ).toBeVisible({ timeout: 15_000 });
 
-  const hasHorizontalOverflow = await page.evaluate(
-    () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
-  );
-  expect(hasHorizontalOverflow).toBe(false);
+    const hasHorizontalOverflow = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth >
+        document.documentElement.clientWidth,
+    );
+    expect(hasHorizontalOverflow).toBe(false);
 
-  const screenshot = await page.screenshot();
-  const image = PNG.sync.read(screenshot);
-  expect(image.width).toBeGreaterThan(300);
-  expect(image.height).toBeGreaterThan(300);
-  expect(countSampledColors(image)).toBeGreaterThan(20);
+    const screenshot = await page.screenshot();
+    const image = PNG.sync.read(screenshot);
+    expect(image.width).toBeGreaterThanOrEqual(viewport.width);
+    expect(image.height).toBeGreaterThanOrEqual(viewport.height);
+    expect(countSampledColors(image)).toBeGreaterThan(20);
+  }
 });
 
 function countSampledColors(image: PNG): number {

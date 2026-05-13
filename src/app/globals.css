@@ -9,6 +9,8 @@
   --color-primary-strong: #163f96;
   --color-accent: #087f5b;
   --color-danger: #b42318;
+  --color-warning-bg: #fff8e5;
+  --color-warning-border: #f2c94c;
   --shadow-soft: 0 12px 30px rgb(23 32 51 / 8%);
 }
 
@@ -41,8 +43,20 @@ a {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .skip-link {
@@ -85,20 +99,32 @@ input {
   gap: 8px;
 }
 
+.search-panel {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 96%);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(12px);
+}
+
+.search-panel__primary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+}
+
 .search-form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   align-items: end;
   gap: 12px;
-  padding: 16px;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  background: var(--color-surface);
-  box-shadow: var(--shadow-soft);
-}
-
-.search-form__field:first-child {
-  grid-column: span 2;
 }
 
 .search-form__field {
@@ -110,6 +136,13 @@ input {
   color: var(--color-muted);
   font-size: 0.92rem;
   font-weight: 700;
+}
+
+.field-help {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
 }
 
 .text-input {
@@ -126,7 +159,10 @@ input {
 .button:focus-visible,
 .pagination__link:focus-visible,
 .back-link:focus-visible,
-.repository-card a:focus-visible {
+.repository-card a:focus-visible,
+.filter-chip a:focus-visible,
+.filter-summary__reset:focus-visible,
+.filter-details summary:focus-visible {
   outline: 3px solid rgb(35 87 198 / 30%);
   outline-offset: 3px;
 }
@@ -158,6 +194,67 @@ input {
   color: var(--color-primary);
   border-color: rgb(35 87 198 / 24%);
   background: #ffffff;
+}
+
+.filter-details {
+  border-top: 1px solid var(--color-border);
+  padding-top: 12px;
+}
+
+.filter-details summary {
+  width: fit-content;
+  min-height: 36px;
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: var(--color-primary);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.filter-details .search-form {
+  margin-top: 10px;
+}
+
+.filter-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.filter-summary__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgb(35 87 198 / 20%);
+  border-radius: 999px;
+  padding: 6px 8px 6px 12px;
+  color: var(--color-text);
+  background: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.filter-chip a,
+.filter-summary__reset,
+.repository-card__external {
+  color: var(--color-primary);
+  font-weight: 800;
+  text-underline-offset: 0.18em;
+}
+
+.filter-summary__reset {
+  min-height: 36px;
+  border-radius: 8px;
+  padding: 7px 10px;
 }
 
 .section-heading {
@@ -193,7 +290,7 @@ input {
 
 .repository-card {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 34%);
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 36%);
   gap: 16px;
   padding: 18px;
   border: 1px solid var(--color-border);
@@ -204,6 +301,27 @@ input {
 .repository-card__body,
 .repository-detail__header {
   min-width: 0;
+}
+
+.repository-card__header {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+}
+
+.repository-card__avatar {
+  flex: 0 0 auto;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.repository-card__owner {
+  margin: 0 0 2px;
+  color: var(--color-accent);
+  font-size: 0.86rem;
+  font-weight: 800;
 }
 
 .repository-card__title {
@@ -225,6 +343,14 @@ input {
   line-height: 1.65;
 }
 
+.repository-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
 .repository-card__stats,
 .detail-stats {
   display: grid;
@@ -233,7 +359,7 @@ input {
 }
 
 .repository-card__stats {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-content: start;
 }
 
@@ -313,18 +439,73 @@ dd {
 }
 
 .empty-state p,
-.error-message p {
+.error-message p,
+.state-suggestions {
   color: var(--color-muted);
   line-height: 1.7;
 }
 
+.state-suggestions {
+  margin: 0;
+  padding-left: 20px;
+}
+
 .error-message {
-  border-color: rgb(180 35 24 / 32%);
+  border-color: var(--color-warning-border);
+  background: var(--color-warning-bg);
 }
 
 .error-message h1,
 .error-message h2 {
   color: var(--color-danger);
+}
+
+.error-message__action {
+  font-weight: 700;
+}
+
+.loading-state {
+  overflow: hidden;
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #e8edf5;
+}
+
+.skeleton::after {
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 0%) 0%,
+    rgb(255 255 255 / 70%) 50%,
+    rgb(255 255 255 / 0%) 100%
+  );
+  animation: skeleton-shimmer 1.4s infinite;
+  content: "";
+}
+
+.skeleton--title {
+  width: min(360px, 70%);
+  height: 30px;
+}
+
+.skeleton--line {
+  width: min(620px, 100%);
+  height: 18px;
+}
+
+.skeleton-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.skeleton--card {
+  height: 118px;
 }
 
 .rate-limit-status {
@@ -399,6 +580,12 @@ dd {
     padding-top: 28px;
   }
 
+  .search-panel {
+    top: 0;
+    padding: 12px;
+  }
+
+  .search-panel__primary,
   .search-form,
   .repository-card {
     grid-template-columns: 1fr;
@@ -421,7 +608,7 @@ dd {
 
 @media (width <= 460px) {
   .search-form {
-    padding: 12px;
+    gap: 10px;
   }
 
   .button,
@@ -437,5 +624,17 @@ dd {
 
   .repository-detail__header {
     display: grid;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
   }
 }

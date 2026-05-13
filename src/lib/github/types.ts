@@ -11,6 +11,7 @@ export type GitHubRepository = {
   html_url: string;
   description: string | null;
   language: string | null;
+  updated_at?: string | null;
   stargazers_count: number;
   watchers_count: number;
   subscribers_count?: number;
@@ -23,4 +24,3 @@ export type GitHubSearchRepositoriesResponse = {
   incomplete_results: boolean;
   items: GitHubRepository[];
 };
-

@@ -68,3 +68,23 @@ test("shows rate limit guidance in the page", async ({ page }) => {
     page.getByRole("heading", { name: "GitHub API 残量" }),
   ).toBeVisible();
 });
+
+test("supports keyboard search and repository activation", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByRole("combobox", { name: "検索キーワード" }).focus();
+  await page.keyboard.type("next");
+  await page.keyboard.press("Enter");
+
+  await expect(
+    page.getByRole("heading", { name: "検索結果" }),
+  ).toBeVisible({ timeout: 15_000 });
+
+  const repositoryLink = page.getByRole("link", { name: "vercel/next.js" });
+  await repositoryLink.focus();
+  await page.keyboard.press("Enter");
+
+  await expect(page).toHaveURL(/\/repositories\/vercel\/next\.js/, {
+    timeout: 15_000,
+  });
+});

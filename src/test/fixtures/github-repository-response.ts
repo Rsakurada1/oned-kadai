@@ -11,6 +11,7 @@ export const githubRepositoryResponse: GitHubRepository = {
   html_url: "https://github.com/vercel/next.js",
   description: "The React Framework",
   language: "JavaScript",
+  updated_at: "2026-05-01T10:00:00Z",
   stargazers_count: 128_000,
   watchers_count: 128_000,
   subscribers_count: 2_300,
@@ -25,4 +26,3 @@ export const githubRepositoryWithoutSubscribersResponse: GitHubRepository = {
   full_name: "vercel/without-subscribers",
   subscribers_count: undefined,
 };
-

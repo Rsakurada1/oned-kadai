@@ -15,6 +15,7 @@ export function toRepositoryListItem(
     ownerAvatarUrl: repository.owner.avatar_url,
     description: repository.description,
     language: repository.language,
+    updatedAt: repository.updated_at ?? null,
     stars: repository.stargazers_count,
     forks: repository.forks_count,
     openIssues: repository.open_issues_count,
@@ -30,4 +31,3 @@ export function toRepositoryDetail(
     watchers: repository.subscribers_count ?? 0,
   };
 }
-

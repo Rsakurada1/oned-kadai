@@ -1,9 +1,11 @@
 import { EmptyState } from "@/features/repositories/components/empty-state";
 import { ErrorMessage } from "@/features/repositories/components/error-message";
+import { FilterSummary } from "@/features/repositories/components/filter-summary";
 import { Pagination } from "@/features/repositories/components/pagination";
 import { RateLimitStatus } from "@/features/repositories/components/rate-limit-status";
 import { RepositoryList } from "@/features/repositories/components/repository-list";
 import { SearchForm } from "@/features/repositories/components/search-form";
+import { SearchStatusAnnouncer } from "@/features/repositories/components/search-status-announcer";
 import {
   parseSearchParams,
   type RepositorySearchParams,
@@ -35,6 +37,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         sort={search.sort}
         topic={search.topic}
       />
+      <FilterSummary search={search} />
       {search.q ? await renderSearchResult(search) : null}
     </div>
   );
@@ -56,6 +59,10 @@ async function renderSearchResult(search: RepositorySearchParams) {
     if (result.items.length === 0) {
       return (
         <>
+          <SearchStatusAnnouncer
+            focusTargetId="empty-state-heading"
+            message={`${search.q} の検索結果はありません。`}
+          />
           <EmptyState
             language={search.language}
             minStars={search.minStars}
@@ -69,6 +76,10 @@ async function renderSearchResult(search: RepositorySearchParams) {
 
     return (
       <>
+        <SearchStatusAnnouncer
+          focusTargetId="search-results-heading"
+          message={`${search.q} の検索結果を ${result.totalCount.toLocaleString()} 件表示しました。`}
+        />
         <RepositoryList
           repositories={result.items}
           search={{ ...search, page: result.page }}
@@ -89,7 +100,15 @@ async function renderSearchResult(search: RepositorySearchParams) {
       classifiedError.kind === "validation" ||
       classifiedError.kind === "rate-limit"
     ) {
-      return <ErrorMessage error={classifiedError} />;
+      return (
+        <>
+          <SearchStatusAnnouncer
+            focusTargetId="search-error-heading"
+            message={classifiedError.title}
+          />
+          <ErrorMessage error={classifiedError} />
+        </>
+      );
     }
 
     throw error;

@@ -22,6 +22,7 @@ describe("SearchForm", () => {
     expect(form).toHaveAttribute("method", "get");
     expect(form).toHaveAttribute("action", "/");
     expect(input).toHaveValue("next");
+    expect(screen.getByText("詳細フィルター")).toBeInTheDocument();
     expect(screen.getByLabelText("Language")).toHaveValue("TypeScript");
     expect(input).toHaveAttribute("list", "repository-search-suggestions");
     expect(screen.getByLabelText("Language")).toHaveAttribute(
