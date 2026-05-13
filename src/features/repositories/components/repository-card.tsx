@@ -10,6 +10,9 @@ type RepositoryCardProps = {
   search: RepositorySearchParams;
 };
 
+/**
+ * 一覧カードはアプリ内の詳細ページと GitHub 外部リンクを分けて、操作先を明確にする。
+ */
 export function RepositoryCard({
   repository,
   search,
@@ -78,6 +81,9 @@ export function RepositoryCard({
   );
 }
 
+/**
+ * 詳細ページから検索結果へ戻れるよう、現在の検索条件をクエリとして引き継ぐ。
+ */
 function createDetailHref(
   repository: RepositoryListItem,
   search: RepositorySearchParams,
@@ -89,6 +95,9 @@ function createDetailHref(
   )}/${encodeURIComponent(repository.name)}?${params.toString()}`;
 }
 
+/**
+ * GitHub API やテスト用モックで日付が欠けてもカード全体を壊さないための表示用整形。
+ */
 function formatDate(value: string | null): string {
   if (!value) {
     return "Unknown";

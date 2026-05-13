@@ -9,6 +9,9 @@ type PaginationProps = {
   totalPages: number;
 };
 
+/**
+ * q や filter を維持したまま、通常の Link 遷移で前後ページへ移動する。
+ */
 export function Pagination({
   search,
   currentPage,

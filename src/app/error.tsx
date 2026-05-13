@@ -5,6 +5,9 @@ type ErrorPageProps = {
   reset: () => void;
 };
 
+/**
+ * 想定外エラーは App Router の error boundary に任せ、最小限の再試行 UI を出す。
+ */
 export default function ErrorPage({ error, reset }: ErrorPageProps) {
   void error;
 
@@ -18,4 +21,3 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
     </div>
   );
 }
-

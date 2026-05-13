@@ -5,6 +5,9 @@ type EmptyStateProps = {
   minStars?: number | null;
 };
 
+/**
+ * 0 件時に現在の条件を明示し、次に試せる調整案を同じ画面内で提示する。
+ */
 export function EmptyState({
   q,
   language = "",

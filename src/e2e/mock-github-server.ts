@@ -66,6 +66,9 @@ process.on("SIGTERM", () => {
   });
 });
 
+/**
+ * E2E 用の検索 API。特定キーワードで empty/rate limit/validation を再現する。
+ */
 function handleSearch(url: URL, response: Parameters<typeof sendJson>[0]) {
   const q = url.searchParams.get("q") ?? "";
 
@@ -95,6 +98,9 @@ function handleSearch(url: URL, response: Parameters<typeof sendJson>[0]) {
   sendJson(response, 200, githubSearchResponse);
 }
 
+/**
+ * 一覧とは別に詳細 API を返し、実アプリと同じ再取得フローを検証できるようにする。
+ */
 function handleRepositoryDetail(
   url: URL,
   response: Parameters<typeof sendJson>[0],
@@ -110,6 +116,9 @@ function handleRepositoryDetail(
   sendJson(response, 200, repository);
 }
 
+/**
+ * GitHub API 互換の rate limit ヘッダーを常に付けて、画面表示とログの検証に使う。
+ */
 function sendJson(
   response: import("node:http").ServerResponse,
   status: number,

@@ -82,8 +82,7 @@ test("supports keyboard search and repository activation", async ({ page }) => {
   ).toBeVisible({ timeout: 15_000 });
 
   const repositoryLink = page.getByRole("link", { name: "vercel/next.js" });
-  await repositoryLink.focus();
-  await page.keyboard.press("Enter");
+  await repositoryLink.press("Enter");
 
   await expect(page).toHaveURL(/\/repositories\/vercel\/next\.js/, {
     timeout: 15_000,

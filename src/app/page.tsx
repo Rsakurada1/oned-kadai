@@ -21,6 +21,7 @@ type HomePageProps = {
 
 const PER_PAGE = 20;
 
+/** Top page は URL query を検索状態として読み、form と検索結果を組み立てます。 */
 export default async function HomePage({ searchParams }: HomePageProps) {
   const sp = await searchParams;
   const search = parseSearchParams(sp);
@@ -44,6 +45,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   );
 }
 
+/**
+ * 検索結果と /rate_limit を並行取得します。
+ * 結果が cache hit した場合でも API 残量表示はできるだけ新しい値にします。
+ */
 async function renderSearchResult(search: RepositorySearchParams) {
   try {
     const [result, searchRateLimit] = await Promise.all([
@@ -101,6 +106,7 @@ async function renderSearchResult(search: RepositorySearchParams) {
   } catch (error) {
     const classifiedError = classifyGitHubError(error);
 
+    // 仕様上、検索条件エラーと rate limit はページ内で回復可能な案内として表示する。
     if (
       classifiedError.kind === "validation" ||
       classifiedError.kind === "rate-limit"

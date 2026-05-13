@@ -12,6 +12,10 @@ type GetRepositoryDetailInput = {
 
 const GITHUB_REPOSITORY_DETAIL_CACHE_SECONDS = 300;
 
+/**
+ * 詳細ページ用に必ず /repos/{owner}/{repo} を再取得します。
+ * 一覧画面の情報へ依存しないことで、直リンクとリロード時の整合性を保ちます。
+ */
 export async function getRepositoryDetail({
   owner,
   repo,

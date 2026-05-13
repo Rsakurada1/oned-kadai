@@ -13,6 +13,9 @@ type FilterChip = {
   removeHref: string;
 };
 
+/**
+ * 現在の検索条件をチップとして表示し、URL を正本にしたまま解除操作を提供する。
+ */
 export function FilterSummary({ search }: FilterSummaryProps) {
   const chips = createFilterChips(search);
 
@@ -42,6 +45,9 @@ export function FilterSummary({ search }: FilterSummaryProps) {
   );
 }
 
+/**
+ * 各チップの解除リンクは該当条件だけを外し、結果の取り違えを避けるため page を 1 に戻す。
+ */
 function createFilterChips(search: RepositorySearchParams): FilterChip[] {
   const chips: FilterChip[] = [];
 
@@ -100,4 +106,3 @@ function createFilterChips(search: RepositorySearchParams): FilterChip[] {
 
   return chips;
 }
-

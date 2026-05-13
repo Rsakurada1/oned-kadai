@@ -4,6 +4,9 @@ type RateLimitStatusProps = {
   rateLimit: GitHubRateLimit | null | undefined;
 };
 
+/**
+ * GitHub API の残量をレスポンスヘッダーまたは /rate_limit の結果から画面に出す。
+ */
 export function RateLimitStatus({ rateLimit }: RateLimitStatusProps) {
   if (!rateLimit) {
     return null;
@@ -37,6 +40,9 @@ export function RateLimitStatus({ rateLimit }: RateLimitStatusProps) {
   );
 }
 
+/**
+ * 一部ヘッダーだけ取得できた場合も、分かる情報だけを崩さず表示する。
+ */
 function formatRemaining(rateLimit: GitHubRateLimit): string {
   if (rateLimit.remaining === null && rateLimit.limit === null) {
     return "不明";
@@ -52,4 +58,3 @@ function formatRemaining(rateLimit: GitHubRateLimit): string {
 
   return `${rateLimit.remaining.toLocaleString()} / ${rateLimit.limit.toLocaleString()} 回`;
 }
-

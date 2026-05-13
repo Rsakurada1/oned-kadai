@@ -23,6 +23,10 @@ const MAX_CACHE_ENTRIES = 200;
 const responseCache = new Map<string, CacheEntry>();
 let redisClient: Redis | null | undefined;
 
+/**
+ * URL と認証有無から cache key を作ります。
+ * 生 URL を Redis key に出さないよう sha256 で短く固定化しています。
+ */
 export function createGitHubCacheKey(url: URL): string {
   const source = JSON.stringify({
     url: url.toString(),
@@ -32,10 +36,14 @@ export function createGitHubCacheKey(url: URL): string {
   return `github-response:${createHash("sha256").update(source).digest("hex")}`;
 }
 
+/**
+ * fresh/stale のどちらを取り出すかを呼び出し側で指定できる cache 読み取り処理。
+ */
 export async function getCachedGitHubResponse<T>(
   cacheKey: string,
   cacheStatus: Exclude<GitHubCacheStatus, "network">,
 ): Promise<CachedGitHubResponse<T> | null> {
+  // まずプロセス内 cache、なければ Redis shared cache を見に行く二段構えです。
   const entry =
     responseCache.get(cacheKey) ?? (await getSharedCacheEntry(cacheKey));
   if (!entry) {
@@ -47,6 +55,7 @@ export async function getCachedGitHubResponse<T>(
     cacheStatus === "fresh" ? entry.freshUntil : entry.staleUntil;
 
   if (now > validUntil) {
+    // stale 期限も過ぎた entry は、このプロセスからは即時削除する。
     if (now > entry.staleUntil) {
       responseCache.delete(cacheKey);
     }
@@ -61,6 +70,9 @@ export async function getCachedGitHubResponse<T>(
   };
 }
 
+/**
+ * network で取得したレスポンスを process cache と shared cache の両方へ保存する。
+ */
 export async function setCachedGitHubResponse<T>(
   cacheKey: string,
   response: Pick<CachedGitHubResponse<T>, "data" | "rateLimit">,
@@ -69,6 +81,7 @@ export async function setCachedGitHubResponse<T>(
 ) {
   evictOldestEntries();
 
+  // freshUntil は通常利用、staleUntil は GitHub API 失敗時の fallback 用です。
   const now = Date.now();
   const entry = {
     data: response.data,
@@ -86,10 +99,16 @@ export async function setCachedGitHubResponse<T>(
   );
 }
 
+/**
+ * Unit test で状態を持ち越さないための in-memory cache 初期化。
+ */
 export function clearGitHubResponseCache() {
   responseCache.clear();
 }
 
+/**
+ * ローカル process cache が増え続けないよう、最も古い entry を 1 件だけ削除する。
+ */
 function evictOldestEntries() {
   if (responseCache.size < MAX_CACHE_ENTRIES) {
     return;
@@ -107,6 +126,7 @@ function evictOldestEntries() {
 async function getSharedCacheEntry(
   cacheKey: string,
 ): Promise<CacheEntry | null> {
+  // Redis が不調でもアプリ本体は落とさず、in-memory cache だけで継続する。
   const redis = getRedisClient();
   if (!redis) {
     return null;
@@ -134,6 +154,7 @@ async function setSharedCacheEntry(
   entry: CacheEntry,
   ttlSeconds: number,
 ) {
+  // Redis 書き込み失敗は observability に残し、リクエスト処理は成功させる。
   const redis = getRedisClient();
   if (!redis) {
     return;
@@ -148,6 +169,9 @@ async function setSharedCacheEntry(
   }
 }
 
+/**
+ * Redis は任意機能として遅延初期化し、未設定時は null で in-memory cache のみに戻す。
+ */
 function getRedisClient(): Redis | null {
   if (redisClient !== undefined) {
     return redisClient;
@@ -159,6 +183,7 @@ function getRedisClient(): Redis | null {
     return redisClient;
   }
 
+  // enableOfflineQueue=false で Redis 停止時に待ち続けないようにする。
   redisClient = new Redis(url, {
     enableOfflineQueue: false,
     maxRetriesPerRequest: 1,

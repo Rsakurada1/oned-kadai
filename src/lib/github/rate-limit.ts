@@ -7,6 +7,9 @@ export type GitHubRateLimit = {
   retryAfterSeconds: number | null;
 };
 
+/**
+ * GitHub API の rate limit 関連ヘッダーを、画面表示とログで共通利用する形に正規化する。
+ */
 export function parseGitHubRateLimitHeaders(
   headers: Headers,
 ): GitHubRateLimit | null {
@@ -38,6 +41,9 @@ export function parseGitHubRateLimitHeaders(
   };
 }
 
+/**
+ * 欠損や想定外の値は null に寄せ、呼び出し側で部分的な情報として扱えるようにする。
+ */
 function parseIntegerHeader(value: string | null): number | null {
   if (!value) {
     return null;
@@ -51,6 +57,9 @@ function parseIntegerHeader(value: string | null): number | null {
   return parsed;
 }
 
+/**
+ * x-ratelimit-reset は Unix 秒なので、表示しやすい ISO 文字列へ変換する。
+ */
 function parseResetAt(value: string | null): string | null {
   const unixSeconds = parseIntegerHeader(value);
   if (unixSeconds === null) {
@@ -59,4 +68,3 @@ function parseResetAt(value: string | null): string | null {
 
   return new Date(unixSeconds * 1_000).toISOString();
 }
-

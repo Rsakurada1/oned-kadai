@@ -1,5 +1,8 @@
 import type { GitHubRateLimit } from "./rate-limit";
 
+/**
+ * GitHub API から返った HTTP ステータスと rate limit 情報を保持する domain error。
+ */
 export class GitHubApiError extends Error {
   constructor(
     readonly status: number,
@@ -25,6 +28,9 @@ export type ClassifiedGitHubError = {
   rateLimit?: GitHubRateLimit | null;
 };
 
+/**
+ * GitHub API の HTTP ステータスを、画面で扱うエラー種別と案内文に変換する。
+ */
 export function classifyGitHubError(error: unknown): ClassifiedGitHubError {
   if (!(error instanceof GitHubApiError)) {
     return {

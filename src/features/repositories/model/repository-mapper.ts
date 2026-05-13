@@ -4,6 +4,7 @@ import type {
   RepositoryListItem,
 } from "./repository";
 
+/** GitHub API の snake_case response を UI 用の camelCase model に寄せます。 */
 export function toRepositoryListItem(
   repository: GitHubRepository,
 ): RepositoryListItem {
@@ -23,6 +24,7 @@ export function toRepositoryListItem(
   };
 }
 
+/** Watcher 数は GitHub API 仕様に合わせ、watchers_count ではなく subscribers_count を使います。 */
 export function toRepositoryDetail(
   repository: GitHubRepository,
 ): RepositoryDetail {

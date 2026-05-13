@@ -35,6 +35,10 @@ export type GitHubResponse<T> = {
 
 const DEFAULT_GITHUB_API_BASE_URL = "https://api.github.com";
 
+/**
+ * GitHub API 呼び出しの入口です。
+ * URL 生成、cache、rate limit header、OpenTelemetry、structured log をここへ集約します。
+ */
 export async function githubFetch<T>(
   path: string,
   options: GitHubFetchOptions,
@@ -49,6 +53,9 @@ export async function githubFetch<T>(
   );
 }
 
+/**
+ * cache 確認、network fetch、fallback 判定を 1 つの span の中で実行する本体処理。
+ */
 async function githubFetchWithSpan<T>(
   path: string,
   options: GitHubFetchOptions,
@@ -59,6 +66,7 @@ async function githubFetchWithSpan<T>(
   const cachedResponse = await getCachedGitHubResponse<T>(cacheKey, "fresh");
 
   if (cachedResponse) {
+    // fresh cache は GitHub API を叩かず返す。trace/metrics には cache hit として残す。
     span.setAttributes({
       "github.cache.status": cachedResponse.cacheStatus,
       "github.request.url": sanitizeUrlForTelemetry(url),
@@ -116,6 +124,7 @@ async function githubFetchWithSpan<T>(
     const staleResponse = await getCachedGitHubResponse<T>(cacheKey, "stale");
 
     if (staleResponse && shouldServeStaleResponse(response.status)) {
+      // rate limit や GitHub 側障害では、期限内の stale cache を優先して UX を守る。
       span.setAttribute("github.cache.status", staleResponse.cacheStatus);
       recordGitHubCacheEvent({
         "github.path": path,
@@ -155,6 +164,9 @@ async function githubFetchWithSpan<T>(
   return parsedResponse;
 }
 
+/**
+ * 環境変数で差し替え可能な GitHub API base URL と path/query から完全な URL を作る。
+ */
 function createGitHubUrl(
   path: string,
   searchParams?: GitHubFetchOptions["searchParams"],
@@ -172,20 +184,26 @@ function createGitHubUrl(
   return url;
 }
 
+/** 一時的な API 失敗だけ stale fallback を許可し、validation/404 は正しく失敗させます。 */
 function shouldServeStaleResponse(status: number): boolean {
   return status === 403 || status === 429 || status >= 500;
 }
 
+/** token などが URL に混ざっても telemetry に出さないための保険です。 */
 function sanitizeUrlForTelemetry(url: URL): string {
   const sanitized = new URL(url);
   sanitized.searchParams.delete("access_token");
   return sanitized.toString();
 }
 
+/**
+ * undefined/null を除いた属性だけを span に渡し、OTel 側の型制約を吸収する。
+ */
 function setSpanAttributes(
   span: import("@opentelemetry/api").Span,
   attributes: Record<string, null | number | string | undefined>,
 ) {
+  // OpenTelemetry Attributes は null を受け付けないため、ここでまとめて除去する。
   const compactAttributes: Attributes = {};
 
   for (const [key, value] of Object.entries(attributes)) {
@@ -197,7 +215,11 @@ function setSpanAttributes(
   span.setAttributes(compactAttributes);
 }
 
+/**
+ * API エラー本文からユーザー向け分類に使う message を取り出す。
+ */
 async function readErrorMessage(response: Response): Promise<string> {
+  // GitHub の error body は JSON が多いが、proxy 等で非 JSON になる可能性もある。
   try {
     const body = (await response.json()) as { message?: string };
     return body.message ?? response.statusText;

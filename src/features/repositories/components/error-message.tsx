@@ -5,6 +5,9 @@ type ErrorMessageProps = {
   error: ClassifiedGitHubError;
 };
 
+/**
+ * 検索で回復可能な GitHub API エラーを、ページ内の alert として案内する。
+ */
 export function ErrorMessage({ error }: ErrorMessageProps) {
   return (
     <section

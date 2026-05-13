@@ -24,6 +24,10 @@ type SearchRepositoriesInput = {
 const GITHUB_SEARCH_CACHE_SECONDS = 60;
 const GITHUB_SEARCH_RESULT_LIMIT = 1_000;
 
+/**
+ * リポジトリ検索の application service です。
+ * GitHub API の件数制限や filter の query 化をここに閉じ込めます。
+ */
 export async function searchRepositories({
   q,
   language,
@@ -55,6 +59,7 @@ export async function searchRepositories({
     GITHUB_SEARCH_RESULT_LIMIT,
   );
 
+  // GitHub Search API は 1,000 件までしかページングできないため、UI の総ページも上限に合わせる。
   return {
     items: response.data.items.map(toRepositoryListItem),
     totalCount: response.data.total_count,

@@ -4,6 +4,7 @@ const searchUrl =
   "/?q=next&language=TypeScript&topic=frontend&minStars=100&sort=stars&order=desc";
 
 test.describe("visual regression snapshots", () => {
+  // スナップショット更新のノイズを避けるため、明示的に有効化したときだけ実行する。
   test.skip(
     process.env.VISUAL_SNAPSHOT !== "1",
     "Set VISUAL_SNAPSHOT=1 to run screenshot snapshot assertions.",
@@ -49,4 +50,3 @@ test.describe("visual regression snapshots", () => {
     );
   });
 });
-

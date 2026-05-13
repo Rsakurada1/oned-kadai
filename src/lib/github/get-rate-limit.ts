@@ -18,6 +18,10 @@ type GitHubRateLimitResponse = {
 
 const GITHUB_RATE_LIMIT_CACHE_SECONDS = 60;
 
+/**
+ * 検索結果自体が cache hit しても API 残量だけは新しめに見せるための補助取得です。
+ * 取得に失敗しても画面表示は既存 header 情報へ fallback します。
+ */
 export async function getGitHubSearchRateLimit(): Promise<GitHubRateLimit | null> {
   try {
     const response = await githubFetch<GitHubRateLimitResponse>("/rate_limit", {
@@ -35,6 +39,7 @@ export async function getGitHubSearchRateLimit(): Promise<GitHubRateLimit | null
   }
 }
 
+/** GitHub の /rate_limit response を画面表示用の共通 model に寄せます。 */
 function toGitHubRateLimit(
   resource: GitHubRateLimitResource | undefined,
   resourceName: string,
@@ -52,4 +57,3 @@ function toGitHubRateLimit(
     used: resource.used,
   };
 }
-

@@ -5,6 +5,10 @@ type BuildRepositorySearchQueryInput = {
   minStars: number | null;
 };
 
+/**
+ * UI の filter 状態を GitHub Search API の q 文字列へ変換します。
+ * sort/order は q ではなく API query param 側で渡すため、ここには含めません。
+ */
 export function buildRepositorySearchQuery({
   q,
   language,
@@ -30,6 +34,7 @@ export function buildRepositorySearchQuery({
   return parts.filter(Boolean).join(" ");
 }
 
+/** 空白を含む qualifier 値は GitHub Search syntax に合わせて quote します。 */
 function formatQualifierValue(value: string): string {
   if (!/\s/.test(value)) {
     return value;

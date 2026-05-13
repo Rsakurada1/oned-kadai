@@ -48,6 +48,9 @@ const TOPIC_SUGGESTIONS = [
   "devtools",
 ];
 
+/**
+ * 検索状態を URL クエリに残すため、JavaScript 依存の submit 処理を持たない native form にする。
+ */
 export function SearchForm({
   q = "",
   language = "",

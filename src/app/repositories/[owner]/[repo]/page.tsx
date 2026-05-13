@@ -30,6 +30,7 @@ type LoadRepositoryDetailResult =
       error: ClassifiedGitHubError;
     };
 
+/** Dynamic route の params と戻り先 query を解決し、詳細表示だけを合成します。 */
 export default async function RepositoryDetailPage({
   params,
   searchParams,
@@ -53,6 +54,7 @@ export default async function RepositoryDetailPage({
   );
 }
 
+/** 404 は notFound、それ以外の想定外エラーは error.tsx へ委譲します。 */
 async function loadRepositoryDetail(
   owner: string,
   repo: string,

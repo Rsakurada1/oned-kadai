@@ -16,6 +16,7 @@ test("search results have no serious accessibility violations", async ({
   const accessibilityScanResults = await new AxeBuilder({ page })
     .include("main")
     .analyze();
+  // CI では重大度の高い問題に絞り、軽微な指摘でデリバリーを止めすぎない。
   const seriousViolations = accessibilityScanResults.violations.filter(
     (violation) =>
       violation.impact === "serious" || violation.impact === "critical",
@@ -27,6 +28,7 @@ test("search results have no serious accessibility violations", async ({
 test("search results render a non-empty responsive viewport", async ({
   page,
 }) => {
+  // 代表的な mobile/tablet/desktop 幅で横スクロールと描画の空振りをまとめて検知する。
   for (const viewport of [
     { width: 360, height: 740 },
     { width: 768, height: 900 },
@@ -53,6 +55,9 @@ test("search results render a non-empty responsive viewport", async ({
   }
 });
 
+/**
+ * スクリーンショットが真っ白や単色に近い状態になっていないかを軽量に検出する。
+ */
 function countSampledColors(image: PNG): number {
   const colors = new Set<string>();
   const step = Math.max(1, Math.floor((image.width * image.height) / 5_000));

@@ -11,6 +11,9 @@ type RepositoryDetailProps = {
   backHref: string;
 };
 
+/**
+ * 詳細ページで再取得した repository 情報を表示し、一覧へ戻るための検索 URL を受け取る。
+ */
 export function RepositoryDetail({
   repository,
   rateLimit,

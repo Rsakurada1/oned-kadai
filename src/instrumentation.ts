@@ -14,6 +14,9 @@ type RequestErrorRequest = {
   headers?: Headers;
 };
 
+/**
+ * Next.js 起動時に OpenTelemetry を登録し、初期化完了を structured log に残す。
+ */
 export async function register() {
   registerOTel({
     serviceName: process.env.OTEL_SERVICE_NAME ?? "oned-kadai",
@@ -25,6 +28,9 @@ export async function register() {
   });
 }
 
+/**
+ * App Router の未処理エラーを構造化して記録し、route や renderSource と紐付ける。
+ */
 export async function onRequestError(
   error: unknown,
   request: RequestErrorRequest,

@@ -1,5 +1,8 @@
 export const GITHUB_API_VERSION = "2022-11-28";
 
+/**
+ * GitHub API 推奨ヘッダーを必ず付け、トークンがある環境では認証リクエストにする。
+ */
 export function createGitHubHeaders(token = process.env.GITHUB_TOKEN): HeadersInit {
   const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
@@ -12,4 +15,3 @@ export function createGitHubHeaders(token = process.env.GITHUB_TOKEN): HeadersIn
 
   return headers;
 }
-

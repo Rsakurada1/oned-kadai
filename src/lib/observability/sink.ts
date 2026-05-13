@@ -4,6 +4,9 @@ export type StructuredLogPayload = Record<string, unknown> & {
   event: string;
 };
 
+/**
+ * 任意の webhook にログを非同期転送する。失敗してもリクエスト処理は止めない。
+ */
 export function sendStructuredLog(payload: StructuredLogPayload) {
   if (typeof window !== "undefined") {
     return;
@@ -47,4 +50,3 @@ export function sendStructuredLog(payload: StructuredLogPayload) {
     );
   }
 }
-

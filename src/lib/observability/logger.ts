@@ -17,6 +17,9 @@ export function logError(event: string, fields: LogFields = {}) {
   writeLog("error", event, fields);
 }
 
+/**
+ * すべてのログを JSON 形式にそろえ、アクティブな trace/span 情報を自動で付与する。
+ */
 function writeLog(level: LogLevel, event: string, fields: LogFields) {
   const payload = {
     timestamp: new Date().toISOString(),

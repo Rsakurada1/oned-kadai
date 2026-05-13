@@ -8,6 +8,9 @@ type RepositoryListProps = {
   totalCount: number;
 };
 
+/**
+ * 検索結果の見出しをフォーカス可能にし、検索後の移動先としても使える一覧領域。
+ */
 export function RepositoryList({
   repositories,
   search,
