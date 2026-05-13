@@ -1,15 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import type { GitHubRateLimit } from "@/lib/github/rate-limit";
 import type { RepositoryDetail as RepositoryDetailModel } from "../model/repository";
+import { RateLimitStatus } from "./rate-limit-status";
 
 type RepositoryDetailProps = {
   repository: RepositoryDetailModel;
+  rateLimit?: GitHubRateLimit | null;
   backHref: string;
 };
 
 export function RepositoryDetail({
   repository,
+  rateLimit,
   backHref,
 }: RepositoryDetailProps) {
   return (
@@ -70,7 +74,7 @@ export function RepositoryDetail({
       >
         GitHub で開く
       </a>
+      <RateLimitStatus rateLimit={rateLimit} />
     </article>
   );
 }
-

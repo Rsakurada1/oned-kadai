@@ -3,10 +3,20 @@ import "server-only";
 import { githubFetch } from "@/lib/github/client";
 import type { GitHubSearchRepositoriesResponse } from "@/lib/github/types";
 import type { RepositorySearchResult } from "../model/repository";
+import type {
+  RepositorySearchOrder,
+  RepositorySearchSort,
+} from "../model/search-params";
 import { toRepositoryListItem } from "../model/repository-mapper";
+import { buildRepositorySearchQuery } from "../model/search-query";
 
 type SearchRepositoriesInput = {
   q: string;
+  language: string;
+  topic: string;
+  minStars: number | null;
+  sort: RepositorySearchSort;
+  order: RepositorySearchOrder;
   page: number;
   perPage: number;
 };
@@ -16,6 +26,11 @@ const GITHUB_SEARCH_RESULT_LIMIT = 1_000;
 
 export async function searchRepositories({
   q,
+  language,
+  topic,
+  minStars,
+  sort,
+  order,
   page,
   perPage,
 }: SearchRepositoriesInput): Promise<RepositorySearchResult> {
@@ -23,8 +38,12 @@ export async function searchRepositories({
     "/search/repositories",
     {
       revalidate: GITHUB_SEARCH_CACHE_SECONDS,
+      staleWhileRevalidate: 300,
+      tags: ["github:search"],
       searchParams: {
-        q,
+        q: buildRepositorySearchQuery({ q, language, topic, minStars }),
+        sort: sort === "best-match" ? undefined : sort,
+        order: sort === "best-match" ? undefined : order,
         page,
         per_page: perPage,
       },
@@ -32,17 +51,17 @@ export async function searchRepositories({
   );
 
   const cappedTotalCount = Math.min(
-    response.total_count,
+    response.data.total_count,
     GITHUB_SEARCH_RESULT_LIMIT,
   );
 
   return {
-    items: response.items.map(toRepositoryListItem),
-    totalCount: response.total_count,
+    items: response.data.items.map(toRepositoryListItem),
+    totalCount: response.data.total_count,
     page,
     perPage,
     totalPages:
       cappedTotalCount === 0 ? 0 : Math.ceil(cappedTotalCount / perPage),
+    rateLimit: response.rateLimit,
   };
 }
-

@@ -1,7 +1,10 @@
+import type { GitHubRateLimit } from "./rate-limit";
+
 export class GitHubApiError extends Error {
   constructor(
     readonly status: number,
     message: string,
+    readonly rateLimit: GitHubRateLimit | null = null,
   ) {
     super(message);
     this.name = "GitHubApiError";
@@ -19,6 +22,7 @@ export type ClassifiedGitHubError = {
   title: string;
   message: string;
   status?: number;
+  rateLimit?: GitHubRateLimit | null;
 };
 
 export function classifyGitHubError(error: unknown): ClassifiedGitHubError {
@@ -37,6 +41,7 @@ export function classifyGitHubError(error: unknown): ClassifiedGitHubError {
       message:
         "GitHub API が検索条件を処理できませんでした。キーワードを変えて再検索してください。",
       status: error.status,
+      rateLimit: error.rateLimit,
     };
   }
 
@@ -47,6 +52,7 @@ export function classifyGitHubError(error: unknown): ClassifiedGitHubError {
       message:
         "少し時間を置いてから再試行してください。GITHUB_TOKEN を設定すると制限が緩和されます。",
       status: error.status,
+      rateLimit: error.rateLimit,
     };
   }
 
@@ -56,6 +62,7 @@ export function classifyGitHubError(error: unknown): ClassifiedGitHubError {
       title: "リポジトリが見つかりません",
       message: "指定されたリポジトリは存在しないか、公開されていません。",
       status: error.status,
+      rateLimit: error.rateLimit,
     };
   }
 
@@ -64,6 +71,6 @@ export function classifyGitHubError(error: unknown): ClassifiedGitHubError {
     title: "予期しないエラーが発生しました",
     message: "時間を置いてからもう一度お試しください。",
     status: error.status,
+    rateLimit: error.rateLimit,
   };
 }
-

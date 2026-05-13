@@ -1,10 +1,12 @@
 import { EmptyState } from "@/features/repositories/components/empty-state";
 import { ErrorMessage } from "@/features/repositories/components/error-message";
 import { Pagination } from "@/features/repositories/components/pagination";
+import { RateLimitStatus } from "@/features/repositories/components/rate-limit-status";
 import { RepositoryList } from "@/features/repositories/components/repository-list";
 import { SearchForm } from "@/features/repositories/components/search-form";
 import {
   parseSearchParams,
+  type RepositorySearchParams,
   type RawSearchParams,
 } from "@/features/repositories/model/search-params";
 import { searchRepositories } from "@/features/repositories/services/search-repositories";
@@ -18,38 +20,64 @@ const PER_PAGE = 20;
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const sp = await searchParams;
-  const { q, page } = parseSearchParams(sp);
+  const search = parseSearchParams(sp);
 
   return (
     <div className="page-stack">
       <header className="page-header">
         <h1>GitHub リポジトリ検索</h1>
       </header>
-      <SearchForm q={q} />
-      {q ? await renderSearchResult(q, page) : null}
+      <SearchForm
+        language={search.language}
+        minStars={search.minStars}
+        order={search.order}
+        q={search.q}
+        sort={search.sort}
+        topic={search.topic}
+      />
+      {search.q ? await renderSearchResult(search) : null}
     </div>
   );
 }
 
-async function renderSearchResult(q: string, page: number) {
+async function renderSearchResult(search: RepositorySearchParams) {
   try {
-    const result = await searchRepositories({ q, page, perPage: PER_PAGE });
+    const result = await searchRepositories({
+      q: search.q,
+      language: search.language,
+      topic: search.topic,
+      minStars: search.minStars,
+      sort: search.sort,
+      order: search.order,
+      page: search.page,
+      perPage: PER_PAGE,
+    });
 
     if (result.items.length === 0) {
-      return <EmptyState q={q} />;
+      return (
+        <>
+          <EmptyState
+            language={search.language}
+            minStars={search.minStars}
+            q={search.q}
+            topic={search.topic}
+          />
+          <RateLimitStatus rateLimit={result.rateLimit} />
+        </>
+      );
     }
 
     return (
       <>
         <RepositoryList
-          page={result.page}
-          q={q}
           repositories={result.items}
+          search={{ ...search, page: result.page }}
           totalCount={result.totalCount}
         />
+        <RateLimitStatus rateLimit={result.rateLimit} />
         <Pagination
           currentPage={result.page}
-          q={q}
+          search={{ ...search, page: result.page }}
           totalPages={result.totalPages}
         />
       </>
@@ -67,4 +95,3 @@ async function renderSearchResult(q: string, page: number) {
     throw error;
   }
 }
-

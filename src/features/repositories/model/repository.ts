@@ -1,3 +1,5 @@
+import type { GitHubRateLimit } from "@/lib/github/rate-limit";
+
 export type RepositoryListItem = {
   id: number;
   name: string;
@@ -22,5 +24,10 @@ export type RepositorySearchResult = {
   page: number;
   perPage: number;
   totalPages: number;
+  rateLimit: GitHubRateLimit | null;
 };
 
+export type RepositoryDetailResult = {
+  repository: RepositoryDetail;
+  rateLimit: GitHubRateLimit | null;
+};

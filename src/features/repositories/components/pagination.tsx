@@ -1,12 +1,19 @@
 import Link from "next/link";
 
+import type { RepositorySearchParams } from "../model/search-params";
+import { createRepositorySearchUrl } from "../model/search-url";
+
 type PaginationProps = {
-  q: string;
+  search: RepositorySearchParams;
   currentPage: number;
   totalPages: number;
 };
 
-export function Pagination({ q, currentPage, totalPages }: PaginationProps) {
+export function Pagination({
+  search,
+  currentPage,
+  totalPages,
+}: PaginationProps) {
   if (totalPages <= 1) {
     return null;
   }
@@ -20,7 +27,7 @@ export function Pagination({ q, currentPage, totalPages }: PaginationProps) {
         <Link
           aria-label={`前のページ ${currentPage - 1} へ`}
           className="pagination__link"
-          href={createPageHref(q, currentPage - 1)}
+          href={createRepositorySearchUrl(search, currentPage - 1)}
         >
           前へ
         </Link>
@@ -38,7 +45,7 @@ export function Pagination({ q, currentPage, totalPages }: PaginationProps) {
         <Link
           aria-label={`次のページ ${currentPage + 1} へ`}
           className="pagination__link"
-          href={createPageHref(q, currentPage + 1)}
+          href={createRepositorySearchUrl(search, currentPage + 1)}
         >
           次へ
         </Link>
@@ -50,13 +57,3 @@ export function Pagination({ q, currentPage, totalPages }: PaginationProps) {
     </nav>
   );
 }
-
-function createPageHref(q: string, page: number): string {
-  const params = new URLSearchParams({
-    q,
-    page: String(page),
-  });
-
-  return `/?${params.toString()}`;
-}
-

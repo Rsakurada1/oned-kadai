@@ -6,7 +6,8 @@ import {
   parseSearchParams,
   type RawSearchParams,
 } from "@/features/repositories/model/search-params";
-import type { RepositoryDetail as RepositoryDetailModel } from "@/features/repositories/model/repository";
+import { createRepositorySearchUrl } from "@/features/repositories/model/search-url";
+import type { RepositoryDetailResult as RepositoryDetailResultModel } from "@/features/repositories/model/repository";
 import { getRepositoryDetail } from "@/features/repositories/services/get-repository-detail";
 import {
   classifyGitHubError,
@@ -23,7 +24,7 @@ type RepositoryDetailPageProps = {
 
 type LoadRepositoryDetailResult =
   | {
-      data: RepositoryDetailModel;
+      data: RepositoryDetailResultModel;
     }
   | {
       error: ClassifiedGitHubError;
@@ -36,14 +37,20 @@ export default async function RepositoryDetailPage({
   const { owner, repo } = await params;
   const sp = await searchParams;
   const search = parseSearchParams(sp);
-  const backHref = createBackHref(search.q, search.page);
+  const backHref = createRepositorySearchUrl(search);
   const repository = await loadRepositoryDetail(owner, repo);
 
   if ("error" in repository) {
     return <ErrorMessage error={repository.error} />;
   }
 
-  return <RepositoryDetail backHref={backHref} repository={repository.data} />;
+  return (
+    <RepositoryDetail
+      backHref={backHref}
+      rateLimit={repository.data.rateLimit}
+      repository={repository.data.repository}
+    />
+  );
 }
 
 async function loadRepositoryDetail(
@@ -69,17 +76,4 @@ async function loadRepositoryDetail(
 
     throw error;
   }
-}
-
-function createBackHref(q: string, page: number): string {
-  if (!q) {
-    return "/";
-  }
-
-  const params = new URLSearchParams({
-    q,
-    page: String(page),
-  });
-
-  return `/?${params.toString()}`;
 }

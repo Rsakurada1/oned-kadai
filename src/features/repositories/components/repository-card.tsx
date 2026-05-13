@@ -1,15 +1,19 @@
 import Link from "next/link";
 
 import type { RepositoryListItem } from "../model/repository";
+import type { RepositorySearchParams } from "../model/search-params";
+import { createRepositorySearchUrlParams } from "../model/search-url";
 
 type RepositoryCardProps = {
   repository: RepositoryListItem;
-  q: string;
-  page: number;
+  search: RepositorySearchParams;
 };
 
-export function RepositoryCard({ repository, q, page }: RepositoryCardProps) {
-  const detailHref = createDetailHref(repository, q, page);
+export function RepositoryCard({
+  repository,
+  search,
+}: RepositoryCardProps) {
+  const detailHref = createDetailHref(repository, search);
 
   return (
     <article className="repository-card">
@@ -41,16 +45,11 @@ export function RepositoryCard({ repository, q, page }: RepositoryCardProps) {
 
 function createDetailHref(
   repository: RepositoryListItem,
-  q: string,
-  page: number,
+  search: RepositorySearchParams,
 ): string {
-  const params = new URLSearchParams({
-    q,
-    page: String(page),
-  });
+  const params = createRepositorySearchUrlParams(search);
 
   return `/repositories/${encodeURIComponent(
     repository.ownerLogin,
   )}/${encodeURIComponent(repository.name)}?${params.toString()}`;
 }
-

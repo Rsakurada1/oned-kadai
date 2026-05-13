@@ -11,9 +11,16 @@ describe("RepositoryList", () => {
 
     render(
       <RepositoryList
-        page={2}
-        q="next"
         repositories={repositories}
+        search={{
+          q: "next",
+          language: "TypeScript",
+          topic: "frontend",
+          minStars: 100,
+          sort: "stars",
+          order: "desc",
+          page: 2,
+        }}
         totalCount={42}
       />,
     );
@@ -24,8 +31,10 @@ describe("RepositoryList", () => {
     expect(screen.getByText("42 件")).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "vercel/next.js" }),
-    ).toHaveAttribute("href", "/repositories/vercel/next.js?q=next&page=2");
+    ).toHaveAttribute(
+      "href",
+      "/repositories/vercel/next.js?q=next&language=TypeScript&topic=frontend&minStars=100&sort=stars&order=desc&page=2",
+    );
     expect(screen.getByText("facebook/react")).toBeInTheDocument();
   });
 });
-

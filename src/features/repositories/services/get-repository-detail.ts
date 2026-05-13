@@ -2,7 +2,7 @@ import "server-only";
 
 import { githubFetch } from "@/lib/github/client";
 import type { GitHubRepository } from "@/lib/github/types";
-import type { RepositoryDetail } from "../model/repository";
+import type { RepositoryDetailResult } from "../model/repository";
 import { toRepositoryDetail } from "../model/repository-mapper";
 
 type GetRepositoryDetailInput = {
@@ -15,14 +15,18 @@ const GITHUB_REPOSITORY_DETAIL_CACHE_SECONDS = 300;
 export async function getRepositoryDetail({
   owner,
   repo,
-}: GetRepositoryDetailInput): Promise<RepositoryDetail> {
+}: GetRepositoryDetailInput): Promise<RepositoryDetailResult> {
   const repository = await githubFetch<GitHubRepository>(
     `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`,
     {
       revalidate: GITHUB_REPOSITORY_DETAIL_CACHE_SECONDS,
+      staleWhileRevalidate: 1_800,
+      tags: [`github:repository:${owner}/${repo}`],
     },
   );
 
-  return toRepositoryDetail(repository);
+  return {
+    repository: toRepositoryDetail(repository.data),
+    rateLimit: repository.rateLimit,
+  };
 }
-

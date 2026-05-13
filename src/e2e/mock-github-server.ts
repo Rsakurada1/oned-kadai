@@ -97,7 +97,12 @@ function sendJson(
 ) {
   response.writeHead(status, {
     "Content-Type": "application/json; charset=utf-8",
+    "X-GitHub-Request-Id": "mock-request-id",
+    "X-RateLimit-Limit": "60",
+    "X-RateLimit-Remaining": status === 403 || status === 429 ? "0" : "42",
+    "X-RateLimit-Reset": "1710000000",
+    "X-RateLimit-Resource": "search",
+    "X-RateLimit-Used": status === 403 || status === 429 ? "60" : "18",
   });
   response.end(JSON.stringify(body));
 }
-

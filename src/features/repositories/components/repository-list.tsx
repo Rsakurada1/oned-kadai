@@ -1,17 +1,16 @@
 import type { RepositoryListItem } from "../model/repository";
+import type { RepositorySearchParams } from "../model/search-params";
 import { RepositoryCard } from "./repository-card";
 
 type RepositoryListProps = {
   repositories: RepositoryListItem[];
-  q: string;
-  page: number;
+  search: RepositorySearchParams;
   totalCount: number;
 };
 
 export function RepositoryList({
   repositories,
-  q,
-  page,
+  search,
   totalCount,
 }: RepositoryListProps) {
   return (
@@ -23,11 +22,10 @@ export function RepositoryList({
       <ul className="repository-list">
         {repositories.map((repository) => (
           <li key={repository.id}>
-            <RepositoryCard page={page} q={q} repository={repository} />
+            <RepositoryCard repository={repository} search={search} />
           </li>
         ))}
       </ul>
     </section>
   );
 }
-
