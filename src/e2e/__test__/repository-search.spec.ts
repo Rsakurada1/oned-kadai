@@ -61,7 +61,9 @@ test("shows an empty state when the search has no results", async ({ page }) => 
 test("shows rate limit guidance in the page", async ({ page }) => {
   await page.goto("/?q=ratelimit");
 
-  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(
+    page.getByRole("alert", { name: "GitHub API の制限に達しました" }),
+  ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "GitHub API の制限に達しました" }),
   ).toBeVisible();

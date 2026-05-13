@@ -47,7 +47,7 @@ test("search results render a non-empty responsive viewport", async ({
     );
     expect(hasHorizontalOverflow).toBe(false);
 
-    const screenshot = await page.screenshot();
+    const screenshot = await page.screenshot({ caret: "initial" });
     const image = PNG.sync.read(screenshot);
     expect(image.width).toBeGreaterThanOrEqual(viewport.width);
     expect(image.height).toBeGreaterThanOrEqual(viewport.height);
