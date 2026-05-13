@@ -20,7 +20,6 @@ test.describe("visual regression snapshots", () => {
       "search-panel.png",
       {
         animations: "disabled",
-        caret: "hide",
         maxDiffPixelRatio: 0.03,
       },
     );
@@ -28,7 +27,6 @@ test.describe("visual regression snapshots", () => {
       "filter-summary.png",
       {
         animations: "disabled",
-        caret: "hide",
         maxDiffPixelRatio: 0.03,
       },
     );
@@ -44,7 +42,6 @@ test.describe("visual regression snapshots", () => {
       "repository-card.png",
       {
         animations: "disabled",
-        caret: "hide",
         maxDiffPixelRatio: 0.03,
       },
     );

@@ -70,7 +70,15 @@ test("shows rate limit guidance in the page", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("supports keyboard search and repository activation", async ({ page }) => {
+test("supports keyboard search and repository activation", async (
+  { page },
+  testInfo,
+) => {
+  test.skip(
+    testInfo.project.name === "mobile-chrome",
+    "Hardware keyboard activation is covered by the desktop project.",
+  );
+
   await page.goto("/");
 
   await page.getByRole("combobox", { name: "検索キーワード" }).focus();
