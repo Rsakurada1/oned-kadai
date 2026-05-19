@@ -2,6 +2,7 @@ import type {
   RepositorySearchOrder,
   RepositorySearchSort,
 } from "../model/search-params";
+import { SearchFilterCombo } from "./search-filter-combo";
 
 type SearchFormProps = {
   q?: string;
@@ -11,14 +12,6 @@ type SearchFormProps = {
   sort?: RepositorySearchSort;
   order?: RepositorySearchOrder;
 };
-
-const QUERY_SUGGESTIONS = [
-  "nextjs",
-  "react",
-  "typescript",
-  "testing-library",
-  "playwright",
-];
 
 const LANGUAGE_SUGGESTIONS = [
   "TypeScript",
@@ -68,10 +61,10 @@ export function SearchForm({
           </label>
           <input
             aria-describedby="repository-search-help"
+            autoComplete="off"
             className="text-input"
             defaultValue={q}
             id="repository-search"
-            list="repository-search-suggestions"
             name="q"
             placeholder="nextjs, react, testing..."
             type="search"
@@ -79,11 +72,6 @@ export function SearchForm({
           <p className="field-help" id="repository-search-help">
             リポジトリ名、説明、関連語で検索できます。
           </p>
-          <datalist id="repository-search-suggestions">
-            {QUERY_SUGGESTIONS.map((suggestion) => (
-              <option key={suggestion} value={suggestion} />
-            ))}
-          </datalist>
         </div>
         <button className="button button--primary" type="submit">
           検索
@@ -93,44 +81,20 @@ export function SearchForm({
       <details className="filter-details" open>
         <summary>詳細フィルター</summary>
         <div className="search-form">
-          <div className="search-form__field">
-            <label className="form-label" htmlFor="repository-language">
-              Language
-            </label>
-            <input
-              className="text-input"
-              defaultValue={language}
-              id="repository-language"
-              list="repository-language-suggestions"
-              name="language"
-              placeholder="TypeScript"
-              type="text"
-            />
-            <datalist id="repository-language-suggestions">
-              {LANGUAGE_SUGGESTIONS.map((suggestion) => (
-                <option key={suggestion} value={suggestion} />
-              ))}
-            </datalist>
-          </div>
-          <div className="search-form__field">
-            <label className="form-label" htmlFor="repository-topic">
-              Topic
-            </label>
-            <input
-              className="text-input"
-              defaultValue={topic}
-              id="repository-topic"
-              list="repository-topic-suggestions"
-              name="topic"
-              placeholder="frontend"
-              type="text"
-            />
-            <datalist id="repository-topic-suggestions">
-              {TOPIC_SUGGESTIONS.map((suggestion) => (
-                <option key={suggestion} value={suggestion} />
-              ))}
-            </datalist>
-          </div>
+          <SearchFilterCombo
+            label="Language"
+            name="language"
+            options={LANGUAGE_SUGGESTIONS}
+            placeholder="自由入力"
+            value={language}
+          />
+          <SearchFilterCombo
+            label="Topic"
+            name="topic"
+            options={TOPIC_SUGGESTIONS}
+            placeholder="自由入力"
+            value={topic}
+          />
           <div className="search-form__field">
             <label className="form-label" htmlFor="repository-min-stars">
               Star 下限

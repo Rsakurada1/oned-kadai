@@ -3,9 +3,9 @@ import { expect, test } from "@playwright/test";
 test("searches repositories and navigates to detail page", async ({ page }) => {
   await page.goto("/");
 
-  await page.getByRole("combobox", { name: "検索キーワード" }).fill("next");
-  await page.getByLabel("Language").fill("TypeScript");
-  await page.getByLabel("Topic").fill("frontend");
+  await page.getByRole("searchbox", { name: "検索キーワード" }).fill("next");
+  await page.getByLabel("Language 候補").selectOption("TypeScript");
+  await page.getByLabel("Topic 候補").selectOption("frontend");
   await page.getByLabel("Star 下限").fill("100");
   await page.getByLabel("並び替え").selectOption("stars");
   await page.getByRole("button", { name: "検索" }).click();
@@ -21,7 +21,7 @@ test("searches repositories and navigates to detail page", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "GitHub API 残量" }),
   ).toBeVisible({ timeout: 15_000 });
-  await expect(page.getByText("41 / 60 回")).toBeVisible();
+  await expect(page.getByText("42 / 60 回")).toBeVisible();
 
   const repositoryLink = page.getByRole("link", { name: "vercel/next.js" });
   await repositoryLink.scrollIntoViewIfNeeded();
@@ -83,7 +83,7 @@ test("supports keyboard search and repository activation", async (
 
   await page.goto("/");
 
-  await page.getByRole("combobox", { name: "検索キーワード" }).focus();
+  await page.getByRole("searchbox", { name: "検索キーワード" }).focus();
   await page.keyboard.type("next");
   await page.keyboard.press("Enter");
 
@@ -92,7 +92,9 @@ test("supports keyboard search and repository activation", async (
   ).toBeVisible({ timeout: 15_000 });
 
   const repositoryLink = page.getByRole("link", { name: "vercel/next.js" });
-  await repositoryLink.press("Enter");
+  await repositoryLink.focus();
+  await expect(repositoryLink).toBeFocused();
+  await page.keyboard.press("Enter");
 
   await expect(page).toHaveURL(/\/repositories\/vercel\/next\.js/, {
     timeout: 15_000,

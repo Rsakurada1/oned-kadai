@@ -34,7 +34,9 @@ export function RepositoryCard({
           <div>
             <p className="repository-card__owner">{repository.ownerLogin}</p>
             <h3 className="repository-card__title">
-              <Link href={detailHref}>{repository.fullName}</Link>
+              <Link href={detailHref} prefetch={false}>
+                {repository.fullName}
+              </Link>
             </h3>
           </div>
         </header>
@@ -42,37 +44,56 @@ export function RepositoryCard({
           {repository.description ?? "説明は登録されていません。"}
         </p>
         <div className="repository-card__actions">
-          <Link className="button button--secondary" href={detailHref}>
+          <Link
+            className="repository-card__action repository-card__action--primary"
+            href={detailHref}
+            prefetch={false}
+          >
+            <span className="repository-card__action-icon" aria-hidden="true">
+              →
+            </span>
             詳細を見る
           </Link>
           <a
-            className="repository-card__external"
+            className="repository-card__action repository-card__action--secondary"
             href={repository.htmlUrl}
             rel="noreferrer"
             target="_blank"
           >
-            GitHub で開く
+            <span className="repository-card__action-icon" aria-hidden="true">
+              ↗
+            </span>
+            GitHubで見る
           </a>
         </div>
       </div>
-      <dl className="repository-card__stats" aria-label={`${repository.fullName} の統計`}>
-        <div>
+      <dl
+        className="repository-card__stats"
+        aria-label={`${repository.fullName} の統計`}
+      >
+        <div className="repository-card__stat repository-card__stat--language">
           <dt>Language</dt>
-          <dd>{repository.language ?? "Unknown"}</dd>
+          <dd>
+            <span
+              className="repository-card__language-dot"
+              aria-hidden="true"
+            />
+            {repository.language ?? "Unknown"}
+          </dd>
         </div>
-        <div>
+        <div className="repository-card__stat repository-card__stat--metric repository-card__stat--stars">
           <dt>Stars</dt>
           <dd>{repository.stars.toLocaleString()}</dd>
         </div>
-        <div>
+        <div className="repository-card__stat repository-card__stat--metric repository-card__stat--forks">
           <dt>Forks</dt>
           <dd>{repository.forks.toLocaleString()}</dd>
         </div>
-        <div>
+        <div className="repository-card__stat repository-card__stat--subtle">
           <dt>Issues</dt>
           <dd>{repository.openIssues.toLocaleString()}</dd>
         </div>
-        <div>
+        <div className="repository-card__stat repository-card__stat--subtle">
           <dt>Updated</dt>
           <dd>{formatDate(repository.updatedAt)}</dd>
         </div>

@@ -13,7 +13,6 @@ import {
 } from "@/features/repositories/model/search-params";
 import { searchRepositories } from "@/features/repositories/services/search-repositories";
 import { classifyGitHubError } from "@/lib/github/errors";
-import { getGitHubSearchRateLimit } from "@/lib/github/get-rate-limit";
 
 type HomePageProps = {
   searchParams: Promise<RawSearchParams>;
@@ -46,25 +45,22 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 }
 
 /**
- * 検索結果と /rate_limit を並行取得します。
- * 結果が cache hit した場合でも API 残量表示はできるだけ新しい値にします。
+ * 検索結果を取得し、同じレスポンスの rate limit header を表示にも使います。
+ * 詳細ページへの prefetch と合わせて余分な GitHub API 呼び出しを増やさないようにします。
  */
 async function renderSearchResult(search: RepositorySearchParams) {
   try {
-    const [result, searchRateLimit] = await Promise.all([
-      searchRepositories({
-        q: search.q,
-        language: search.language,
-        topic: search.topic,
-        minStars: search.minStars,
-        sort: search.sort,
-        order: search.order,
-        page: search.page,
-        perPage: PER_PAGE,
-      }),
-      getGitHubSearchRateLimit(),
-    ]);
-    const rateLimit = searchRateLimit ?? result.rateLimit;
+    const result = await searchRepositories({
+      q: search.q,
+      language: search.language,
+      topic: search.topic,
+      minStars: search.minStars,
+      sort: search.sort,
+      order: search.order,
+      page: search.page,
+      perPage: PER_PAGE,
+    });
+    const rateLimit = result.rateLimit;
 
     if (result.items.length === 0) {
       return (

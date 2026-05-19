@@ -21,7 +21,7 @@ export function RepositoryDetail({
 }: RepositoryDetailProps) {
   return (
     <article className="repository-detail">
-      <Link className="back-link" href={backHref}>
+      <Link className="back-link" href={backHref} prefetch={false}>
         検索結果へ戻る
       </Link>
 

@@ -5,7 +5,7 @@ type RateLimitStatusProps = {
 };
 
 /**
- * GitHub API の残量をレスポンスヘッダーまたは /rate_limit の結果から画面に出す。
+ * GitHub API の残量をレスポンスヘッダーから画面に出す。
  */
 export function RateLimitStatus({ rateLimit }: RateLimitStatusProps) {
   if (!rateLimit) {
