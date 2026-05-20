@@ -1,146 +1,197 @@
-import type {
-  RepositorySearchOrder,
-  RepositorySearchSort,
-} from "../model/search-params";
-import { SearchFilterCombo } from "./search-filter-combo";
+import Link from "next/link";
+
+import {
+  CLOUD_FILTERS,
+  FRAMEWORK_FILTERS,
+  LANGUAGE_FILTERS,
+} from "../model/search-filters";
+import type { RepositorySearchParams } from "../model/search-params";
+import { MetricThresholdRow } from "./metric-threshold-row";
 
 type SearchFormProps = {
-  q?: string;
-  language?: string;
-  topic?: string;
-  minStars?: number | null;
-  sort?: RepositorySearchSort;
-  order?: RepositorySearchOrder;
+  search: RepositorySearchParams;
 };
 
-const LANGUAGE_SUGGESTIONS = [
-  "TypeScript",
-  "JavaScript",
-  "Python",
-  "Go",
-  "Rust",
-  "Java",
-  "Ruby",
-  "PHP",
-  "C#",
-  "C++",
-  "Swift",
-  "Kotlin",
-  "Jupyter Notebook",
-];
+type CheckboxOption = {
+  label: string;
+  value: string;
+  hint?: string;
+};
 
-const TOPIC_SUGGESTIONS = [
-  "nextjs",
-  "react",
-  "typescript",
-  "frontend",
-  "testing",
-  "cli",
-  "api",
-  "machine-learning",
-  "devtools",
-];
+const LANGUAGE_OPTIONS = LANGUAGE_FILTERS.map((language) => ({
+  label: language,
+  value: language,
+}));
+
+const FRAMEWORK_OPTIONS = FRAMEWORK_FILTERS.map(({ label, value }) => ({
+  label,
+  value,
+}));
+
+const CLOUD_OPTIONS = CLOUD_FILTERS.map(({ label, value }) => ({
+  label,
+  value,
+}));
 
 /**
- * 検索状態を URL クエリに残すため、JavaScript 依存の submit 処理を持たない native form にする。
+ * 検索状態は URL query を正本にするため、フォームは GET submit だけで遷移します。
+ * checkbox の repeated params は parseSearchParams 側で comma-separated params と同じ形へ正規化します。
  */
-export function SearchForm({
-  q = "",
-  language = "",
-  topic = "",
-  minStars = null,
-  sort = "best-match",
-  order = "desc",
-}: SearchFormProps) {
+export function SearchForm({ search }: SearchFormProps) {
   return (
     <form action="/" className="search-panel" method="get" role="search">
-      <div className="search-panel__primary">
-        <div className="search-form__field">
-          <label className="form-label" htmlFor="repository-search">
-            検索キーワード
-          </label>
-          <input
-            aria-describedby="repository-search-help"
-            autoComplete="off"
-            className="text-input"
-            defaultValue={q}
-            id="repository-search"
-            name="q"
-            placeholder="nextjs, react, testing..."
-            type="search"
-          />
-          <p className="field-help" id="repository-search-help">
-            リポジトリ名、説明、関連語で検索できます。
-          </p>
-        </div>
-        <button className="button button--primary" type="submit">
-          検索
-        </button>
+      <div className="search-panel__header">
+        <h2>検索条件</h2>
+        <Link className="search-panel__reset" href="/">
+          リセット
+        </Link>
       </div>
 
-      <details className="filter-details" open>
-        <summary>詳細フィルター</summary>
-        <div className="search-form">
-          <SearchFilterCombo
-            label="Language"
-            name="language"
-            options={LANGUAGE_SUGGESTIONS}
-            placeholder="自由入力"
-            value={language}
+      <div className="search-form__field">
+        <label className="form-label" htmlFor="repository-search">
+          キーワード検索
+        </label>
+        <input
+          aria-describedby="repository-search-help"
+          autoComplete="off"
+          className="text-input"
+          defaultValue={search.q}
+          id="repository-search"
+          name="q"
+          placeholder="リポジトリを検索"
+          type="search"
+        />
+        <p className="field-help" id="repository-search-help">
+          ライブラリ名、ツール名、設計キーワードなどを入力できます。
+        </p>
+      </div>
+
+      <CheckboxGroup
+        legend="言語フィルター"
+        name="languages"
+        options={LANGUAGE_OPTIONS}
+        selectedValues={search.languages}
+      />
+
+      <CheckboxGroup
+        legend="フレームワーク・ライブラリ"
+        name="frameworks"
+        options={FRAMEWORK_OPTIONS}
+        selectedValues={search.frameworks}
+      />
+
+      <CheckboxGroup
+        legend="クラウド・インフラ"
+        name="clouds"
+        options={CLOUD_OPTIONS}
+        selectedValues={search.clouds}
+      />
+
+      <fieldset className="filter-group">
+        <legend>こだわり条件</legend>
+        <div className="checkbox-grid checkbox-grid--single">
+          <MetricThresholdRow
+            defaultValue={search.stars ?? 100}
+            enabled={search.stars !== null}
+            label="Star"
+            name="stars"
           />
-          <SearchFilterCombo
-            label="Topic"
-            name="topic"
-            options={TOPIC_SUGGESTIONS}
-            placeholder="自由入力"
-            value={topic}
+          <MetricThresholdRow
+            defaultValue={search.forks ?? 100}
+            enabled={search.forks !== null}
+            label="Fork"
+            name="forks"
           />
-          <div className="search-form__field">
-            <label className="form-label" htmlFor="repository-min-stars">
-              Star 下限
-            </label>
-            <input
-              className="text-input"
-              defaultValue={minStars ?? ""}
-              id="repository-min-stars"
-              min={0}
-              name="minStars"
-              placeholder="100"
-              type="number"
-            />
-          </div>
-          <div className="search-form__field">
-            <label className="form-label" htmlFor="repository-sort">
-              並び替え
-            </label>
-            <select
-              className="text-input"
-              defaultValue={sort}
-              id="repository-sort"
-              name="sort"
-            >
-              <option value="best-match">Best match</option>
-              <option value="stars">Stars</option>
-              <option value="forks">Forks</option>
-              <option value="updated">Updated</option>
-            </select>
-          </div>
-          <div className="search-form__field">
-            <label className="form-label" htmlFor="repository-order">
-              順序
-            </label>
-            <select
-              className="text-input"
-              defaultValue={order}
-              id="repository-order"
-              name="order"
-            >
-              <option value="desc">降順</option>
-              <option value="asc">昇順</option>
-            </select>
-          </div>
+          <CheckboxRow
+            checked={search.lowIssues}
+            hint="取得したページ内で Issue 数 10 以下に絞ります"
+            label="Issueが少ない"
+            name="lowIssues"
+            value="true"
+          />
+          <CheckboxRow
+            checked={search.recentlyUpdated}
+            hint="直近30日以内に push されたリポジトリ"
+            label="最近更新された"
+            name="recentlyUpdated"
+            value="true"
+          />
+          <CheckboxRow
+            checked={search.readme}
+            hint="初期実装では検索条件に含めません"
+            label="READMEあり"
+            name="readme"
+            value="true"
+          />
         </div>
-      </details>
+      </fieldset>
+
+      {search.sort !== "best-match" ? (
+        <>
+          <input name="sort" type="hidden" value={search.sort} />
+          <input name="order" type="hidden" value={search.order} />
+        </>
+      ) : null}
+
+      <button className="button button--primary" type="submit">
+        検索
+      </button>
     </form>
+  );
+}
+
+function CheckboxGroup({
+  legend,
+  name,
+  options,
+  selectedValues,
+}: {
+  legend: string;
+  name: string;
+  options: readonly CheckboxOption[];
+  selectedValues: readonly string[];
+}) {
+  const selected = new Set(selectedValues);
+
+  return (
+    <fieldset className="filter-group">
+      <legend>{legend}</legend>
+      <div className="checkbox-grid">
+        {options.map((option) => (
+          <CheckboxRow
+            checked={selected.has(option.value)}
+            hint={option.hint}
+            key={option.value}
+            label={option.label}
+            name={name}
+            value={option.value}
+          />
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+function CheckboxRow({
+  checked,
+  hint,
+  label,
+  name,
+  value,
+}: {
+  checked: boolean;
+  hint?: string;
+  label: string;
+  name: string;
+  value: string;
+}) {
+  return (
+    <label className="checkbox-row">
+      <input defaultChecked={checked} name={name} type="checkbox" value={value} />
+      <span>
+        <span className="checkbox-row__label">{label}</span>
+        {hint ? <span className="checkbox-row__hint">{hint}</span> : null}
+      </span>
+    </label>
   );
 }

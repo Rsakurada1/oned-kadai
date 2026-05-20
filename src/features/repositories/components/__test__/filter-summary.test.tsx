@@ -9,9 +9,14 @@ describe("FilterSummary", () => {
       <FilterSummary
         search={{
           q: "react",
-          language: "TypeScript",
-          topic: "frontend",
-          minStars: 100,
+          languages: ["TypeScript", "JavaScript"],
+          frameworks: ["React"],
+          clouds: ["AWS"],
+          stars: 100,
+          forks: 100,
+          lowIssues: true,
+          recentlyUpdated: true,
+          readme: true,
           sort: "stars",
           order: "desc",
           page: 2,
@@ -20,20 +25,26 @@ describe("FilterSummary", () => {
     );
 
     expect(screen.getByLabelText("適用中の検索条件")).toBeInTheDocument();
-    expect(screen.getByText("Keyword: react")).toBeInTheDocument();
-    expect(screen.getByText("Language: TypeScript")).toBeInTheDocument();
-    expect(screen.getByText("Topic: frontend")).toBeInTheDocument();
-    expect(screen.getByText("Stars: 100+")).toBeInTheDocument();
-    expect(screen.getByText("Sort: stars / desc")).toBeInTheDocument();
+    expect(screen.getByText("キーワード: react")).toBeInTheDocument();
+    expect(screen.getByText("言語: TypeScript")).toBeInTheDocument();
+    expect(screen.getByText("言語: JavaScript")).toBeInTheDocument();
+    expect(screen.getByText("FW: React")).toBeInTheDocument();
+    expect(screen.getByText("Cloud: AWS")).toBeInTheDocument();
+    expect(screen.getByText("Star 100以上")).toBeInTheDocument();
+    expect(screen.getByText("Fork 100以上")).toBeInTheDocument();
+    expect(screen.getByText("Issueが少ない")).toBeInTheDocument();
+    expect(screen.getByText("最近更新された")).toBeInTheDocument();
+    expect(screen.getByText("READMEあり")).toBeInTheDocument();
+    expect(screen.getByText("並び替え: stars")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "すべてリセット" })).toHaveAttribute(
       "href",
       "/",
     );
     expect(
-      screen.getByRole("link", { name: "Language: TypeScript を解除" }),
+      screen.getByRole("link", { name: "言語: TypeScript を解除" }),
     ).toHaveAttribute(
       "href",
-      "/?q=react&topic=frontend&minStars=100&sort=stars&order=desc&page=1",
+      "/?q=react&languages=JavaScript&frameworks=React&clouds=AWS&stars=100&forks=100&lowIssues=true&recentlyUpdated=true&readme=true&sort=stars&order=desc&page=1",
     );
   });
 
@@ -42,9 +53,14 @@ describe("FilterSummary", () => {
       <FilterSummary
         search={{
           q: "",
-          language: "",
-          topic: "",
-          minStars: null,
+          languages: [],
+          frameworks: [],
+          clouds: [],
+          stars: null,
+          forks: null,
+          lowIssues: false,
+          recentlyUpdated: false,
+          readme: false,
           sort: "best-match",
           order: "desc",
           page: 1,

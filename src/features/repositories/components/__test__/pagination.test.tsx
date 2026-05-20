@@ -10,9 +10,14 @@ describe("Pagination", () => {
         currentPage={2}
         search={{
           q: "react testing",
-          language: "TypeScript",
-          topic: "frontend",
-          minStars: 100,
+          languages: ["TypeScript", "JavaScript"],
+          frameworks: ["React"],
+          clouds: ["AWS"],
+          stars: 100,
+          forks: 100,
+          lowIssues: true,
+          recentlyUpdated: false,
+          readme: false,
           sort: "stars",
           order: "desc",
           page: 2,
@@ -25,13 +30,13 @@ describe("Pagination", () => {
       screen.getByRole("link", { name: "前のページ 1 へ" }),
     ).toHaveAttribute(
       "href",
-      "/?q=react+testing&language=TypeScript&topic=frontend&minStars=100&sort=stars&order=desc&page=1",
+      "/?q=react+testing&languages=TypeScript%2CJavaScript&frameworks=React&clouds=AWS&stars=100&forks=100&lowIssues=true&sort=stars&order=desc&page=1",
     );
     expect(
       screen.getByRole("link", { name: "次のページ 3 へ" }),
     ).toHaveAttribute(
       "href",
-      "/?q=react+testing&language=TypeScript&topic=frontend&minStars=100&sort=stars&order=desc&page=3",
+      "/?q=react+testing&languages=TypeScript%2CJavaScript&frameworks=React&clouds=AWS&stars=100&forks=100&lowIssues=true&sort=stars&order=desc&page=3",
     );
     expect(screen.getByText("2 / 4")).toBeInTheDocument();
   });
@@ -42,9 +47,14 @@ describe("Pagination", () => {
         currentPage={1}
         search={{
           q: "react",
-          language: "",
-          topic: "",
-          minStars: null,
+          languages: [],
+          frameworks: [],
+          clouds: [],
+          stars: null,
+          forks: null,
+          lowIssues: false,
+          recentlyUpdated: false,
+          readme: false,
           sort: "best-match",
           order: "desc",
           page: 1,

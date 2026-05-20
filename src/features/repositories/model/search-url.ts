@@ -1,6 +1,6 @@
 import type { RepositorySearchParams } from "./search-params";
 
-/** 検索状態から共有可能な URL を作ります。filter chip と pagination で共通利用します。 */
+/** 検索状態から共有可能な URL を作ります。filter chip、sort link、pagination で共通利用します。 */
 export function createRepositorySearchUrl(
   search: RepositorySearchParams,
   page = search.page,
@@ -25,16 +25,28 @@ export function createRepositorySearchUrlParams(
     params.set("q", search.q);
   }
 
-  if (search.language) {
-    params.set("language", search.language);
+  setCsvParam(params, "languages", search.languages);
+  setCsvParam(params, "frameworks", search.frameworks);
+  setCsvParam(params, "clouds", search.clouds);
+
+  if (search.stars !== null) {
+    params.set("stars", String(search.stars));
   }
 
-  if (search.topic) {
-    params.set("topic", search.topic);
+  if (search.forks !== null) {
+    params.set("forks", String(search.forks));
   }
 
-  if (search.minStars !== null) {
-    params.set("minStars", String(search.minStars));
+  if (search.lowIssues) {
+    params.set("lowIssues", "true");
+  }
+
+  if (search.recentlyUpdated) {
+    params.set("recentlyUpdated", "true");
+  }
+
+  if (search.readme) {
+    params.set("readme", "true");
   }
 
   if (search.sort !== "best-match") {
@@ -42,10 +54,33 @@ export function createRepositorySearchUrlParams(
     params.set("order", search.order);
   }
 
-  // 未検索状態では page だけが URL に残らないよう、条件がある時だけ付与する。
-  if (search.q || search.language || search.topic || search.minStars !== null) {
+  if (hasAnySearchState(search)) {
     params.set("page", String(page));
   }
 
   return params;
+}
+
+function setCsvParam(
+  params: URLSearchParams,
+  name: string,
+  values: readonly string[],
+) {
+  if (values.length > 0) {
+    params.set(name, values.join(","));
+  }
+}
+
+function hasAnySearchState(search: RepositorySearchParams): boolean {
+  return Boolean(
+    search.q ||
+      search.languages.length > 0 ||
+      search.frameworks.length > 0 ||
+      search.clouds.length > 0 ||
+      search.stars !== null ||
+      search.forks !== null ||
+      search.lowIssues ||
+      search.recentlyUpdated ||
+      search.readme,
+  );
 }

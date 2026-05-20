@@ -14,9 +14,14 @@ describe("RepositoryList", () => {
         repositories={repositories}
         search={{
           q: "next",
-          language: "TypeScript",
-          topic: "frontend",
-          minStars: 100,
+          languages: ["TypeScript"],
+          frameworks: ["React"],
+          clouds: ["AWS"],
+          stars: 100,
+          forks: null,
+          lowIssues: false,
+          recentlyUpdated: false,
+          readme: false,
           sort: "stars",
           order: "desc",
           page: 2,
@@ -33,7 +38,7 @@ describe("RepositoryList", () => {
       screen.getByRole("link", { name: "vercel/next.js" }),
     ).toHaveAttribute(
       "href",
-      "/repositories/vercel/next.js?q=next&language=TypeScript&topic=frontend&minStars=100&sort=stars&order=desc&page=2",
+      "/repositories/vercel/next.js?q=next&languages=TypeScript&frameworks=React&clouds=AWS&stars=100&sort=stars&order=desc&page=2",
     );
     expect(screen.getByText("facebook/react")).toBeInTheDocument();
   });

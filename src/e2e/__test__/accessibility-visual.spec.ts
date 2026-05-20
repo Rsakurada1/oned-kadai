@@ -3,7 +3,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { PNG } from "pngjs";
 
 const searchUrl =
-  "/?q=next&language=TypeScript&topic=frontend&minStars=100&sort=stars&order=desc";
+  "/?q=next&languages=TypeScript&frameworks=React&stars=100&sort=stars&order=desc";
 
 test("search results have no serious accessibility violations", async ({
   page,

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 const searchUrl =
-  "/?q=next&language=TypeScript&topic=frontend&minStars=100&sort=stars&order=desc";
+  "/?q=next&languages=TypeScript&frameworks=React&stars=100&sort=stars&order=desc";
 
 test.describe("visual regression snapshots", () => {
   // スナップショット更新のノイズを避けるため、明示的に有効化したときだけ実行する。

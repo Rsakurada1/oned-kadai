@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  normalizeMinStars,
+  hasSearchCriteria,
+  normalizeForkThreshold,
   normalizeOrder,
   normalizePage,
   normalizeSort,
+  normalizeStarThreshold,
   parseSearchParams,
 } from "../search-params";
 
@@ -12,31 +14,46 @@ describe("parseSearchParams", () => {
   it("trims q and normalizes page", () => {
     expect(parseSearchParams({ q: "  react  ", page: "3" })).toEqual({
       q: "react",
-      language: "",
-      topic: "",
-      minStars: null,
+      languages: [],
+      frameworks: [],
+      clouds: [],
+      stars: null,
+      forks: null,
+      lowIssues: false,
+      recentlyUpdated: false,
+      readme: false,
       sort: "best-match",
       order: "desc",
       page: 3,
     });
   });
 
-  it("uses the first value when search params contain arrays", () => {
+  it("normalizes repeated and comma-separated checkbox params", () => {
     expect(
       parseSearchParams({
         q: ["next", "react"],
-        language: ["TypeScript", "JavaScript"],
-        topic: ["frontend"],
-        minStars: ["100"],
+        languages: ["TypeScript,JavaScript", "Unknown"],
+        frameworks: ["React,Next.js"],
+        clouds: ["AWS", "Docker"],
+        stars: ["100", "1000"],
+        forks: ["100"],
+        lowIssues: "true",
+        recentlyUpdated: "1",
+        readme: "on",
         sort: ["stars"],
         order: ["asc"],
         page: ["2"],
       }),
     ).toEqual({
       q: "next",
-      language: "TypeScript",
-      topic: "frontend",
-      minStars: 100,
+      languages: ["TypeScript", "JavaScript"],
+      frameworks: ["React", "Next.js"],
+      clouds: ["AWS", "Docker"],
+      stars: 1000,
+      forks: 100,
+      lowIssues: true,
+      recentlyUpdated: true,
+      readme: true,
       sort: "stars",
       order: "asc",
       page: 2,
@@ -46,13 +63,39 @@ describe("parseSearchParams", () => {
   it("returns initial search state for empty input", () => {
     expect(parseSearchParams()).toEqual({
       q: "",
-      language: "",
-      topic: "",
-      minStars: null,
+      languages: [],
+      frameworks: [],
+      clouds: [],
+      stars: null,
+      forks: null,
+      lowIssues: false,
+      recentlyUpdated: false,
+      readme: false,
       sort: "best-match",
       order: "desc",
       page: 1,
     });
+  });
+});
+
+describe("hasSearchCriteria", () => {
+  it("ignores README-only state because it is a future filter", () => {
+    expect(
+      hasSearchCriteria({
+        q: "",
+        languages: [],
+        frameworks: [],
+        clouds: [],
+        stars: null,
+        forks: null,
+        lowIssues: false,
+        recentlyUpdated: false,
+        readme: true,
+        sort: "best-match",
+        order: "desc",
+        page: 1,
+      }),
+    ).toBe(false);
   });
 });
 
@@ -70,16 +113,29 @@ describe("normalizePage", () => {
   });
 });
 
-describe("normalizeMinStars", () => {
+describe("normalizeStarThreshold", () => {
   it.each([
     [undefined, null],
     ["", null],
     ["-1", null],
     ["abc", null],
+    ["100", 100],
+    [["100", "1000"], 1000],
+  ] as const)("normalizes %s to %s", (input, expected) => {
+    expect(normalizeStarThreshold(input)).toBe(expected);
+  });
+});
+
+describe("normalizeForkThreshold", () => {
+  it.each([
+    [undefined, null],
+    ["", null],
+    ["-1", null],
+    ["99", 99],
+    ["100", 100],
     ["100.9", 100],
-    [200, 200],
-  ])("normalizes %s to %s", (input, expected) => {
-    expect(normalizeMinStars(input)).toBe(expected);
+  ] as const)("normalizes %s to %s", (input, expected) => {
+    expect(normalizeForkThreshold(input)).toBe(expected);
   });
 });
 

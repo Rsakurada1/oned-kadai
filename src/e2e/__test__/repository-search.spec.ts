@@ -3,17 +3,19 @@ import { expect, test } from "@playwright/test";
 test("searches repositories and navigates to detail page", async ({ page }) => {
   await page.goto("/");
 
-  await page.getByRole("searchbox", { name: "検索キーワード" }).fill("next");
-  await page.getByLabel("Language 候補").selectOption("TypeScript");
-  await page.getByLabel("Topic 候補").selectOption("frontend");
+  await page.getByRole("searchbox", { name: "キーワード検索" }).fill("next");
+  await page.getByLabel("TypeScript").check();
+  await page.getByLabel("React").check();
+  await page.getByLabel("Star 条件を使う").check();
   await page.getByLabel("Star 下限").fill("100");
-  await page.getByLabel("並び替え").selectOption("stars");
   await page.getByRole("button", { name: "検索" }).click();
+  await expect(page).toHaveURL(/q=next/);
+  await page.getByRole("link", { name: "Star順" }).click();
 
   await expect(page).toHaveURL(/q=next/);
-  await expect(page).toHaveURL(/language=TypeScript/);
-  await expect(page).toHaveURL(/topic=frontend/);
-  await expect(page).toHaveURL(/minStars=100/);
+  await expect(page).toHaveURL(/languages=TypeScript/);
+  await expect(page).toHaveURL(/frameworks=React/);
+  await expect(page).toHaveURL(/stars=100/);
   await expect(page).toHaveURL(/sort=stars/);
   await expect(
     page.getByRole("heading", { name: "検索結果" }),
@@ -41,9 +43,9 @@ test("searches repositories and navigates to detail page", async ({ page }) => {
   await page.getByRole("link", { name: "検索結果へ戻る" }).click();
 
   await expect(page).toHaveURL(/q=next/);
-  await expect(page).toHaveURL(/language=TypeScript/);
-  await expect(page).toHaveURL(/topic=frontend/);
-  await expect(page).toHaveURL(/minStars=100/);
+  await expect(page).toHaveURL(/languages=TypeScript/);
+  await expect(page).toHaveURL(/frameworks=React/);
+  await expect(page).toHaveURL(/stars=100/);
   await expect(page).toHaveURL(/sort=stars/);
   await expect(
     page.getByRole("heading", { name: "検索結果" }),
@@ -83,7 +85,7 @@ test("supports keyboard search and repository activation", async (
 
   await page.goto("/");
 
-  await page.getByRole("searchbox", { name: "検索キーワード" }).focus();
+  await page.getByRole("searchbox", { name: "キーワード検索" }).focus();
   await page.keyboard.type("next");
   await page.keyboard.press("Enter");
 

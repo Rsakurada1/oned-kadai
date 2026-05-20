@@ -6,7 +6,10 @@ import { RateLimitStatus } from "@/features/repositories/components/rate-limit-s
 import { RepositoryList } from "@/features/repositories/components/repository-list";
 import { SearchForm } from "@/features/repositories/components/search-form";
 import { SearchStatusAnnouncer } from "@/features/repositories/components/search-status-announcer";
+import { SortLinks } from "@/features/repositories/components/sort-links";
+import { StickySearchSidebar } from "@/features/repositories/components/sticky-search-sidebar";
 import {
+  hasSearchCriteria,
   parseSearchParams,
   type RepositorySearchParams,
   type RawSearchParams,
@@ -20,27 +23,44 @@ type HomePageProps = {
 
 const PER_PAGE = 20;
 
-/** Top page は URL query を検索状態として読み、form と検索結果を組み立てます。 */
+/** Top page は URL query を検索状態として読み、左フィルターと右一覧を組み立てます。 */
 export default async function HomePage({ searchParams }: HomePageProps) {
   const sp = await searchParams;
   const search = parseSearchParams(sp);
 
   return (
-    <div className="page-stack">
+    <div className="repository-search-page">
       <header className="page-header">
+        <p className="page-header__eyebrow">Repository Finder</p>
         <h1>GitHub リポジトリ検索</h1>
       </header>
-      <SearchForm
-        language={search.language}
-        minStars={search.minStars}
-        order={search.order}
-        q={search.q}
-        sort={search.sort}
-        topic={search.topic}
-      />
-      <FilterSummary search={search} />
-      {search.q ? await renderSearchResult(search) : null}
+
+      <div className="search-layout">
+        <StickySearchSidebar>
+          <SearchForm search={search} />
+        </StickySearchSidebar>
+        <section className="search-layout__results" aria-label="検索結果">
+          <SortLinks search={search} />
+          <FilterSummary search={search} />
+          {hasSearchCriteria(search) ? (
+            await renderSearchResult(search)
+          ) : (
+            <InitialSearchState />
+          )}
+        </section>
+      </div>
     </div>
+  );
+}
+
+function InitialSearchState() {
+  return (
+    <section className="empty-state">
+      <h2>条件を選んで検索してください</h2>
+      <p>
+        左の検索条件からキーワード、言語、フレームワーク、クラウド、こだわり条件を選ぶと、公開リポジトリをカード形式で表示します。
+      </p>
+    </section>
   );
 }
 
@@ -52,9 +72,13 @@ async function renderSearchResult(search: RepositorySearchParams) {
   try {
     const result = await searchRepositories({
       q: search.q,
-      language: search.language,
-      topic: search.topic,
-      minStars: search.minStars,
+      languages: search.languages,
+      frameworks: search.frameworks,
+      clouds: search.clouds,
+      stars: search.stars,
+      forks: search.forks,
+      lowIssues: search.lowIssues,
+      recentlyUpdated: search.recentlyUpdated,
       sort: search.sort,
       order: search.order,
       page: search.page,
@@ -67,14 +91,9 @@ async function renderSearchResult(search: RepositorySearchParams) {
         <>
           <SearchStatusAnnouncer
             focusTargetId="empty-state-heading"
-            message={`${search.q} の検索結果はありません。`}
+            message="検索結果はありません。"
           />
-          <EmptyState
-            language={search.language}
-            minStars={search.minStars}
-            q={search.q}
-            topic={search.topic}
-          />
+          <EmptyState search={search} />
           <RateLimitStatus rateLimit={rateLimit} />
         </>
       );
@@ -84,7 +103,7 @@ async function renderSearchResult(search: RepositorySearchParams) {
       <>
         <SearchStatusAnnouncer
           focusTargetId="search-results-heading"
-          message={`${search.q} の検索結果を ${result.totalCount.toLocaleString()} 件表示しました。`}
+          message={`検索結果を ${result.totalCount.toLocaleString()} 件表示しました。`}
         />
         <RepositoryList
           repositories={result.items}

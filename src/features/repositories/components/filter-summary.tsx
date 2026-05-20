@@ -24,10 +24,7 @@ export function FilterSummary({ search }: FilterSummaryProps) {
   }
 
   return (
-    <section
-      aria-label="適用中の検索条件"
-      className="filter-summary"
-    >
+    <section aria-label="適用中の検索条件" className="filter-summary">
       <div className="filter-summary__chips">
         {chips.map((chip) => (
           <span className="filter-chip" key={chip.key}>
@@ -54,38 +51,102 @@ function createFilterChips(search: RepositorySearchParams): FilterChip[] {
   if (search.q) {
     chips.push({
       key: "q",
-      label: `Keyword: ${search.q}`,
+      label: `キーワード: ${search.q}`,
       removeHref: createRepositorySearchUrl({ ...search, q: "", page: 1 }),
     });
   }
 
-  if (search.language) {
+  for (const language of search.languages) {
     chips.push({
-      key: "language",
-      label: `Language: ${search.language}`,
+      key: `language:${language}`,
+      label: `言語: ${language}`,
       removeHref: createRepositorySearchUrl({
         ...search,
-        language: "",
+        languages: removeValue(search.languages, language),
         page: 1,
       }),
     });
   }
 
-  if (search.topic) {
+  for (const framework of search.frameworks) {
     chips.push({
-      key: "topic",
-      label: `Topic: ${search.topic}`,
-      removeHref: createRepositorySearchUrl({ ...search, topic: "", page: 1 }),
+      key: `framework:${framework}`,
+      label: `FW: ${framework}`,
+      removeHref: createRepositorySearchUrl({
+        ...search,
+        frameworks: removeValue(search.frameworks, framework),
+        page: 1,
+      }),
     });
   }
 
-  if (search.minStars !== null) {
+  for (const cloud of search.clouds) {
     chips.push({
-      key: "minStars",
-      label: `Stars: ${search.minStars}+`,
+      key: `cloud:${cloud}`,
+      label: `Cloud: ${cloud}`,
       removeHref: createRepositorySearchUrl({
         ...search,
-        minStars: null,
+        clouds: removeValue(search.clouds, cloud),
+        page: 1,
+      }),
+    });
+  }
+
+  if (search.stars !== null) {
+    chips.push({
+      key: "stars",
+      label: `Star ${search.stars}以上`,
+      removeHref: createRepositorySearchUrl({
+        ...search,
+        stars: null,
+        page: 1,
+      }),
+    });
+  }
+
+  if (search.forks !== null) {
+    chips.push({
+      key: "forks",
+      label: `Fork ${search.forks}以上`,
+      removeHref: createRepositorySearchUrl({
+        ...search,
+        forks: null,
+        page: 1,
+      }),
+    });
+  }
+
+  if (search.lowIssues) {
+    chips.push({
+      key: "lowIssues",
+      label: "Issueが少ない",
+      removeHref: createRepositorySearchUrl({
+        ...search,
+        lowIssues: false,
+        page: 1,
+      }),
+    });
+  }
+
+  if (search.recentlyUpdated) {
+    chips.push({
+      key: "recentlyUpdated",
+      label: "最近更新された",
+      removeHref: createRepositorySearchUrl({
+        ...search,
+        recentlyUpdated: false,
+        page: 1,
+      }),
+    });
+  }
+
+  if (search.readme) {
+    chips.push({
+      key: "readme",
+      label: "READMEあり",
+      removeHref: createRepositorySearchUrl({
+        ...search,
+        readme: false,
         page: 1,
       }),
     });
@@ -94,7 +155,7 @@ function createFilterChips(search: RepositorySearchParams): FilterChip[] {
   if (search.sort !== "best-match") {
     chips.push({
       key: "sort",
-      label: `Sort: ${search.sort} / ${search.order}`,
+      label: `並び替え: ${search.sort}`,
       removeHref: createRepositorySearchUrl({
         ...search,
         sort: "best-match",
@@ -105,4 +166,8 @@ function createFilterChips(search: RepositorySearchParams): FilterChip[] {
   }
 
   return chips;
+}
+
+function removeValue(values: readonly string[], value: string): string[] {
+  return values.filter((currentValue) => currentValue !== value);
 }

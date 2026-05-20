@@ -6,15 +6,22 @@ import type { RepositorySearchResult } from "../model/repository";
 import type {
   RepositorySearchOrder,
   RepositorySearchSort,
+  ForkThreshold,
+  StarThreshold,
 } from "../model/search-params";
 import { toRepositoryListItem } from "../model/repository-mapper";
 import { buildRepositorySearchQuery } from "../model/search-query";
+import { LOW_ISSUES_MAX } from "../model/search-filters";
 
 type SearchRepositoriesInput = {
   q: string;
-  language: string;
-  topic: string;
-  minStars: number | null;
+  languages: string[];
+  frameworks: string[];
+  clouds: string[];
+  stars: StarThreshold | null;
+  forks: ForkThreshold | null;
+  lowIssues: boolean;
+  recentlyUpdated: boolean;
   sort: RepositorySearchSort;
   order: RepositorySearchOrder;
   page: number;
@@ -30,9 +37,13 @@ const GITHUB_SEARCH_RESULT_LIMIT = 1_000;
  */
 export async function searchRepositories({
   q,
-  language,
-  topic,
-  minStars,
+  languages,
+  frameworks,
+  clouds,
+  stars,
+  forks,
+  lowIssues,
+  recentlyUpdated,
   sort,
   order,
   page,
@@ -45,7 +56,16 @@ export async function searchRepositories({
       staleWhileRevalidate: 300,
       tags: ["github:search"],
       searchParams: {
-        q: buildRepositorySearchQuery({ q, language, topic, minStars }),
+        q: buildRepositorySearchQuery({
+          q,
+          languages,
+          frameworks,
+          clouds,
+          stars,
+          forks,
+          lowIssues,
+          recentlyUpdated,
+        }),
         sort: sort === "best-match" ? undefined : sort,
         order: sort === "best-match" ? undefined : order,
         page,
@@ -58,10 +78,15 @@ export async function searchRepositories({
     response.data.total_count,
     GITHUB_SEARCH_RESULT_LIMIT,
   );
+  const items = response.data.items
+    .map(toRepositoryListItem)
+    .filter((repository) =>
+      lowIssues ? repository.openIssues <= LOW_ISSUES_MAX : true,
+    );
 
   // GitHub Search API は 1,000 件までしかページングできないため、UI の総ページも上限に合わせる。
   return {
-    items: response.data.items.map(toRepositoryListItem),
+    items,
     totalCount: response.data.total_count,
     page,
     perPage,

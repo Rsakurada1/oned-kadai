@@ -8,9 +8,14 @@ describe("createRepositorySearchUrl", () => {
       createRepositorySearchUrl(
         {
           q: "react testing",
-          language: "TypeScript",
-          topic: "frontend",
-          minStars: 100,
+          languages: ["TypeScript", "JavaScript"],
+          frameworks: ["React", "Next.js"],
+          clouds: ["AWS"],
+          stars: 100,
+          forks: 100,
+          lowIssues: true,
+          recentlyUpdated: true,
+          readme: true,
           sort: "stars",
           order: "asc",
           page: 2,
@@ -18,7 +23,7 @@ describe("createRepositorySearchUrl", () => {
         3,
       ),
     ).toBe(
-      "/?q=react+testing&language=TypeScript&topic=frontend&minStars=100&sort=stars&order=asc&page=3",
+      "/?q=react+testing&languages=TypeScript%2CJavaScript&frameworks=React%2CNext.js&clouds=AWS&stars=100&forks=100&lowIssues=true&recentlyUpdated=true&readme=true&sort=stars&order=asc&page=3",
     );
   });
 });

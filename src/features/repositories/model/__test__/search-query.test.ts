@@ -7,42 +7,76 @@ describe("buildRepositorySearchQuery", () => {
     expect(
       buildRepositorySearchQuery({
         q: "react",
-        language: "TypeScript",
-        topic: "",
-        minStars: null,
+        languages: ["TypeScript"],
+        frameworks: [],
+        clouds: [],
+        stars: null,
+        forks: null,
+        lowIssues: false,
+        recentlyUpdated: false,
       }),
     ).toBe("react language:TypeScript");
   });
 
-  it("quotes language values that contain spaces", () => {
-    expect(
-      buildRepositorySearchQuery({
-        q: "notebook",
-        language: "Jupyter Notebook",
-        topic: "",
-        minStars: null,
-      }),
-    ).toBe('notebook language:"Jupyter Notebook"');
-  });
-
-  it("adds topic and minimum stars qualifiers", () => {
+  it("builds OR search for multiple languages", () => {
     expect(
       buildRepositorySearchQuery({
         q: "react",
-        language: "TypeScript",
-        topic: "frontend",
-        minStars: 100,
+        languages: ["TypeScript", "JavaScript"],
+        frameworks: [],
+        clouds: [],
+        stars: null,
+        forks: null,
+        lowIssues: false,
+        recentlyUpdated: false,
       }),
-    ).toBe("react language:TypeScript topic:frontend stars:>=100");
+    ).toBe("react (language:TypeScript OR language:JavaScript)");
   });
 
-  it("omits the language qualifier when language is empty", () => {
+  it("adds framework, cloud, stars, forks, and recent qualifiers", () => {
+    expect(
+      buildRepositorySearchQuery({
+        q: "next",
+        languages: ["TypeScript"],
+        frameworks: ["React", "Next.js"],
+        clouds: ["AWS"],
+        stars: 100,
+        forks: 100,
+        lowIssues: false,
+        recentlyUpdated: true,
+        referenceDate: new Date(2026, 4, 20),
+      }),
+    ).toBe(
+      "next language:TypeScript (react OR topic:react OR nextjs OR topic:nextjs) (aws OR topic:aws) stars:>=100 forks:>=100 pushed:>2026-04-20",
+    );
+  });
+
+  it("adds a safe qualifier when low issue count is the only API-backed condition", () => {
+    expect(
+      buildRepositorySearchQuery({
+        q: " ",
+        languages: [],
+        frameworks: [],
+        clouds: [],
+        stars: null,
+        forks: null,
+        lowIssues: true,
+        recentlyUpdated: false,
+      }),
+    ).toBe("stars:>=0");
+  });
+
+  it("omits filters when they are empty", () => {
     expect(
       buildRepositorySearchQuery({
         q: " next ",
-        language: " ",
-        topic: "",
-        minStars: null,
+        languages: [],
+        frameworks: [],
+        clouds: [],
+        stars: null,
+        forks: null,
+        lowIssues: false,
+        recentlyUpdated: false,
       }),
     ).toBe("next");
   });
