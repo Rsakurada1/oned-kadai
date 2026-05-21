@@ -79,10 +79,3 @@ npm run test:visual
 AI コーダーを使い、Next.js 16 / App Router / TypeScript の既存構成を読み取り、URL 正本の検索状態モデル、チェックボックス中心の左サイドバー UI、GitHub Search API の `q` 生成、詳細ページ導線、テスト、README を実装・更新しました。
 
 実装中は、GitHub repository search の qualifier、フレームワーク/クラウドの非構造化条件の扱い、Watcher 数として `subscribers_count` を使う判断、Server Components と native GET form の相性、E2E で実 API に依存しない mock server 構成を確認しました。最終判断は lint、unit/component test、production build の結果を見ながら反映しています。
-
-## 今後の改善
-
-- READMEありを contents API や README 検索と組み合わせて実フィルター化する。
-- Issueが少ない条件を、検索結果全体に対して厳密に適用できる仕組みにする。
-- 複雑な OR query が GitHub 側の validation に当たった場合の fallback query を追加する。
-- Visual snapshot の更新承認フローを CI 上で整備する。
