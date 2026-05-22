@@ -47,6 +47,7 @@ describe("toRepositoryDetail", () => {
       visibility: "public",
       isArchived: false,
       cloneUrl: "https://github.com/vercel/next.js.git",
+      sshUrl: "git@github.com:vercel/next.js.git",
     });
   });
 });

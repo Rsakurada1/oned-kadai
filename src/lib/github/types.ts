@@ -29,6 +29,7 @@ export type GitHubRepository = {
   visibility?: string;
   archived?: boolean;
   clone_url?: string;
+  ssh_url?: string;
   stargazers_count: number;
   watchers_count: number;
   subscribers_count?: number;

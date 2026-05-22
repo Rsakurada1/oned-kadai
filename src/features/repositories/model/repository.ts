@@ -33,6 +33,7 @@ export type RepositoryDetail = RepositoryListItem & {
   visibility: string | null;
   isArchived: boolean;
   cloneUrl: string | null;
+  sshUrl: string | null;
   languages: RepositoryLanguage[];
 };
 

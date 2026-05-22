@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import type { GitHubRateLimit } from "@/lib/github/rate-limit";
 import type { RepositoryDetail as RepositoryDetailModel } from "../model/repository";
+import { CloneCommandPanel } from "./clone-command-panel";
 import { RateLimitStatus } from "./rate-limit-status";
 
 type RepositoryDetailProps = {
@@ -36,7 +37,17 @@ export function RepositoryDetail({
         />
         <div>
           <p className="repository-detail__owner">{repository.ownerLogin}</p>
-          <h1>{repository.fullName}</h1>
+          <div className="repository-detail__title-row">
+            <h1>{repository.fullName}</h1>
+            <a
+              className="button button--secondary"
+              href={repository.htmlUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              GitHubで開く
+            </a>
+          </div>
         </div>
       </header>
 
@@ -69,7 +80,10 @@ export function RepositoryDetail({
         </div>
       </dl>
 
-      <section aria-labelledby="language-breakdown-heading" className="detail-section">
+      <section
+        aria-labelledby="language-breakdown-heading"
+        className="detail-section"
+      >
         <div className="section-heading">
           <h2 id="language-breakdown-heading">言語構成</h2>
           <p>{repository.languages.length} 言語</p>
@@ -100,7 +114,10 @@ export function RepositoryDetail({
         )}
       </section>
 
-      <section aria-labelledby="repository-meta-heading" className="detail-section">
+      <section
+        aria-labelledby="repository-meta-heading"
+        className="detail-section"
+      >
         <div className="section-heading">
           <h2 id="repository-meta-heading">リポジトリ情報</h2>
         </div>
@@ -141,7 +158,10 @@ export function RepositoryDetail({
       </section>
 
       {repository.topics.length > 0 ? (
-        <section aria-labelledby="repository-topics-heading" className="detail-section">
+        <section
+          aria-labelledby="repository-topics-heading"
+          className="detail-section"
+        >
           <div className="section-heading">
             <h2 id="repository-topics-heading">Topics</h2>
           </div>
@@ -153,20 +173,30 @@ export function RepositoryDetail({
         </section>
       ) : null}
 
-      <section aria-labelledby="repository-links-heading" className="detail-section">
-        <div className="section-heading">
-          <h2 id="repository-links-heading">リンク</h2>
-        </div>
-        <div className="detail-actions">
-          <a
-            className="button button--secondary"
-            href={repository.htmlUrl}
-            rel="noreferrer"
-            target="_blank"
-          >
-            GitHub で開く
-          </a>
-          {repository.homepageUrl ? (
+      {repository.cloneUrl || repository.sshUrl ? (
+        <section
+          aria-labelledby="repository-clone-heading"
+          className="detail-section"
+        >
+          <div className="section-heading">
+            <h2 id="repository-clone-heading">Clone</h2>
+          </div>
+          <CloneCommandPanel
+            httpsUrl={repository.cloneUrl}
+            sshUrl={repository.sshUrl}
+          />
+        </section>
+      ) : null}
+
+      {repository.homepageUrl ? (
+        <section
+          aria-labelledby="repository-links-heading"
+          className="detail-section"
+        >
+          <div className="section-heading">
+            <h2 id="repository-links-heading">関連リンク</h2>
+          </div>
+          <div className="detail-actions">
             <a
               className="button button--secondary"
               href={repository.homepageUrl}
@@ -175,19 +205,9 @@ export function RepositoryDetail({
             >
               公式サイトを開く
             </a>
-          ) : null}
-        </div>
-        {repository.cloneUrl ? (
-          <dl className="clone-url">
-            <div>
-              <dt>Clone URL</dt>
-              <dd>
-                <code>{repository.cloneUrl}</code>
-              </dd>
-            </div>
-          </dl>
-        ) : null}
-      </section>
+          </div>
+        </section>
+      ) : null}
 
       <RateLimitStatus rateLimit={rateLimit} />
     </article>

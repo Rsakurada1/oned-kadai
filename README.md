@@ -1,6 +1,6 @@
 # GitHub リポジトリ検索
 
-GitHub REST API の `search/repositories` を使い、公開リポジトリを求人検索サイト風の UI で探せる Next.js App Router アプリです。一覧カードからリポジトリ詳細ページへ遷移し、詳細ページでは主要指標、言語構成、ライセンス、topics、作成日、最終 push、clone URL などを表示します。
+GitHub REST API の `search/repositories` を使い、公開リポジトリを求人検索サイト風の UI で探せる Next.js App Router アプリです。一覧カードからリポジトリ詳細ページへ遷移し、詳細ページでは主要指標、言語構成、ライセンス、topics、作成日、最終 push、clone URL、HTTPS/SSH の clone command などを表示します。
 
 ## 使用技術
 

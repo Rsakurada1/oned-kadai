@@ -60,6 +60,16 @@ test("searches repositories and navigates to detail page", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "リポジトリ情報" }),
   ).toBeVisible({ timeout: 15_000 });
+  await expect(
+    page.getByRole("link", { name: "GitHubで開く" }),
+  ).toHaveAttribute("href", "https://github.com/vercel/next.js");
+  await expect(
+    page.getByText("git clone https://github.com/vercel/next.js.git"),
+  ).toBeVisible({ timeout: 15_000 });
+  await page.getByRole("button", { name: "SSH" }).click();
+  await expect(
+    page.getByText("git clone git@github.com:vercel/next.js.git"),
+  ).toBeVisible();
 
   await page.getByRole("link", { name: "検索結果へ戻る" }).click();
 

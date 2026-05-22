@@ -46,6 +46,7 @@ export function toRepositoryDetail(
     visibility: repository.visibility ?? null,
     isArchived: repository.archived ?? false,
     cloneUrl: repository.clone_url ?? null,
+    sshUrl: repository.ssh_url ?? `git@github.com:${repository.full_name}.git`,
     languages: toRepositoryLanguages(languages),
   };
 }

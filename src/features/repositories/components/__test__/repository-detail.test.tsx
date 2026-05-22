@@ -30,6 +30,13 @@ describe("RepositoryDetail", () => {
     expect(screen.getByText("nextjs")).toBeInTheDocument();
     expect(screen.getByText("https://github.com/vercel/next.js.git")).toBeInTheDocument();
     expect(
+      screen.getByText("git clone https://github.com/vercel/next.js.git"),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "URLをコピー" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "GitHubで開く" }),
+    ).toHaveAttribute("href", "https://github.com/vercel/next.js");
+    expect(
       screen.getByRole("link", { name: "検索結果へ戻る" }),
     ).toHaveAttribute("href", "/?q=next&page=1");
     expect(

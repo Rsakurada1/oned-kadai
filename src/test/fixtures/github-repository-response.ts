@@ -27,6 +27,7 @@ export const githubRepositoryResponse: GitHubRepository = {
   visibility: "public",
   archived: false,
   clone_url: "https://github.com/vercel/next.js.git",
+  ssh_url: "git@github.com:vercel/next.js.git",
   stargazers_count: 128_000,
   watchers_count: 128_000,
   subscribers_count: 2_300,
