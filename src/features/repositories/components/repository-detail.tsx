@@ -48,7 +48,7 @@ export function RepositoryDetail({
 
       <dl className="detail-stats">
         <div>
-          <dt>Language</dt>
+          <dt>主な言語</dt>
           <dd>{repository.language ?? "Unknown"}</dd>
         </div>
         <div>
@@ -69,15 +69,166 @@ export function RepositoryDetail({
         </div>
       </dl>
 
-      <a
-        className="button button--secondary"
-        href={repository.htmlUrl}
-        rel="noreferrer"
-        target="_blank"
-      >
-        GitHub で開く
-      </a>
+      <section aria-labelledby="language-breakdown-heading" className="detail-section">
+        <div className="section-heading">
+          <h2 id="language-breakdown-heading">言語構成</h2>
+          <p>{repository.languages.length} 言語</p>
+        </div>
+        {repository.languages.length > 0 ? (
+          <div className="language-breakdown">
+            <div className="language-bar" aria-hidden="true">
+              {repository.languages.map((language) => (
+                <span
+                  key={language.name}
+                  style={{ flexGrow: language.bytes }}
+                />
+              ))}
+            </div>
+            <dl className="language-list">
+              {repository.languages.map((language) => (
+                <div key={language.name}>
+                  <dt>{language.name}</dt>
+                  <dd>{language.percentage.toFixed(1)}%</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        ) : (
+          <p className="detail-section__empty">
+            言語情報は公開されていません。
+          </p>
+        )}
+      </section>
+
+      <section aria-labelledby="repository-meta-heading" className="detail-section">
+        <div className="section-heading">
+          <h2 id="repository-meta-heading">リポジトリ情報</h2>
+        </div>
+        <dl className="detail-meta">
+          <div>
+            <dt>ライセンス</dt>
+            <dd>{repository.licenseName ?? "未設定"}</dd>
+          </div>
+          <div>
+            <dt>Default branch</dt>
+            <dd>{repository.defaultBranch ?? "不明"}</dd>
+          </div>
+          <div>
+            <dt>公開範囲</dt>
+            <dd>{formatVisibility(repository.visibility)}</dd>
+          </div>
+          <div>
+            <dt>状態</dt>
+            <dd>{repository.isArchived ? "Archived" : "Active"}</dd>
+          </div>
+          <div>
+            <dt>作成日</dt>
+            <dd>{formatDate(repository.createdAt)}</dd>
+          </div>
+          <div>
+            <dt>最終 push</dt>
+            <dd>{formatDate(repository.pushedAt)}</dd>
+          </div>
+          <div>
+            <dt>更新日</dt>
+            <dd>{formatDate(repository.updatedAt)}</dd>
+          </div>
+          <div>
+            <dt>サイズ</dt>
+            <dd>{formatSize(repository.sizeKb)}</dd>
+          </div>
+        </dl>
+      </section>
+
+      {repository.topics.length > 0 ? (
+        <section aria-labelledby="repository-topics-heading" className="detail-section">
+          <div className="section-heading">
+            <h2 id="repository-topics-heading">Topics</h2>
+          </div>
+          <ul className="topic-list">
+            {repository.topics.map((topic) => (
+              <li key={topic}>{topic}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      <section aria-labelledby="repository-links-heading" className="detail-section">
+        <div className="section-heading">
+          <h2 id="repository-links-heading">リンク</h2>
+        </div>
+        <div className="detail-actions">
+          <a
+            className="button button--secondary"
+            href={repository.htmlUrl}
+            rel="noreferrer"
+            target="_blank"
+          >
+            GitHub で開く
+          </a>
+          {repository.homepageUrl ? (
+            <a
+              className="button button--secondary"
+              href={repository.homepageUrl}
+              rel="noreferrer"
+              target="_blank"
+            >
+              公式サイトを開く
+            </a>
+          ) : null}
+        </div>
+        {repository.cloneUrl ? (
+          <dl className="clone-url">
+            <div>
+              <dt>Clone URL</dt>
+              <dd>
+                <code>{repository.cloneUrl}</code>
+              </dd>
+            </div>
+          </dl>
+        ) : null}
+      </section>
+
       <RateLimitStatus rateLimit={rateLimit} />
     </article>
   );
+}
+
+function formatDate(value: string | null): string {
+  if (!value) {
+    return "不明";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "不明";
+  }
+
+  return new Intl.DateTimeFormat("ja-JP", {
+    dateStyle: "medium",
+  }).format(date);
+}
+
+function formatSize(value: number | null): string {
+  if (value === null) {
+    return "不明";
+  }
+
+  if (value >= 1_024) {
+    return `${(value / 1_024).toFixed(1)} MB`;
+  }
+
+  return `${value.toLocaleString()} KB`;
+}
+
+function formatVisibility(value: string | null): string {
+  if (value === "public") {
+    return "Public";
+  }
+
+  if (value === "private") {
+    return "Private";
+  }
+
+  return value ?? "不明";
 }

@@ -10,7 +10,10 @@ describe("RepositoryDetail", () => {
     render(
       <RepositoryDetail
         backHref="/?q=next&page=1"
-        repository={toRepositoryDetail(githubRepositoryResponse)}
+        repository={toRepositoryDetail(githubRepositoryResponse, {
+          JavaScript: 5_600_000,
+          TypeScript: 3_100_000,
+        })}
       />,
     );
 
@@ -18,10 +21,19 @@ describe("RepositoryDetail", () => {
       screen.getByRole("heading", { name: "vercel/next.js" }),
     ).toBeInTheDocument();
     expect(screen.getByAltText("vercel icon")).toBeInTheDocument();
-    expect(screen.getByText("Language")).toBeInTheDocument();
+    expect(screen.getByText("主な言語")).toBeInTheDocument();
     expect(screen.getByText("2,300")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "言語構成" })).toBeInTheDocument();
+    expect(screen.getByText("64.4%")).toBeInTheDocument();
+    expect(screen.getByText("MIT License")).toBeInTheDocument();
+    expect(screen.getByText("canary")).toBeInTheDocument();
+    expect(screen.getByText("nextjs")).toBeInTheDocument();
+    expect(screen.getByText("https://github.com/vercel/next.js.git")).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "検索結果へ戻る" }),
     ).toHaveAttribute("href", "/?q=next&page=1");
+    expect(
+      screen.getByRole("link", { name: "公式サイトを開く" }),
+    ).toHaveAttribute("href", "https://nextjs.org");
   });
 });

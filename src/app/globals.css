@@ -825,7 +825,8 @@ dd {
   background: rgb(35 87 198 / 8%);
 }
 
-.repository-detail__header {
+.repository-detail__header,
+.detail-actions {
   display: flex;
   align-items: center;
   gap: 18px;
@@ -855,6 +856,115 @@ dd {
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
+.detail-section {
+  display: grid;
+  gap: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 18px;
+  background: var(--color-surface);
+}
+
+.detail-section h2 {
+  margin: 0;
+  font-size: 1.08rem;
+}
+
+.detail-section__empty {
+  margin: 0;
+  color: var(--color-muted);
+}
+
+.language-breakdown {
+  display: grid;
+  gap: 12px;
+}
+
+.language-bar {
+  display: flex;
+  width: 100%;
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e8edf5;
+}
+
+.language-bar span {
+  min-width: 8px;
+  background: var(--color-primary);
+}
+
+.language-bar span:nth-child(2) {
+  background: var(--color-accent);
+}
+
+.language-bar span:nth-child(3) {
+  background: var(--color-warm);
+}
+
+.language-bar span:nth-child(4) {
+  background: #7b61ff;
+}
+
+.language-bar span:nth-child(n + 5) {
+  background: #8c95a6;
+}
+
+.language-list,
+.detail-meta,
+.clone-url {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.language-list {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.language-list div,
+.detail-meta div,
+.clone-url div {
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fbfcff;
+}
+
+.detail-meta {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.topic-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.topic-list li {
+  border: 1px solid rgb(35 87 198 / 20%);
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: var(--color-primary);
+  background: #f7faff;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.detail-actions {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.clone-url code {
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
 @media (width <= 1040px) {
   .search-layout {
     grid-template-columns: 290px minmax(0, 1fr);
@@ -862,7 +972,9 @@ dd {
   }
 
   .repository-card__stats,
-  .detail-stats {
+  .detail-stats,
+  .detail-meta,
+  .language-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -903,7 +1015,9 @@ dd {
   .checkbox-grid,
   .repository-card__stats,
   .detail-stats,
-  .rate-limit-status dl {
+  .rate-limit-status dl,
+  .detail-meta,
+  .language-list {
     grid-template-columns: 1fr;
   }
 

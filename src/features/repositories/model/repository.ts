@@ -15,8 +15,25 @@ export type RepositoryListItem = {
   htmlUrl: string;
 };
 
+export type RepositoryLanguage = {
+  name: string;
+  bytes: number;
+  percentage: number;
+};
+
 export type RepositoryDetail = RepositoryListItem & {
   watchers: number;
+  licenseName: string | null;
+  topics: string[];
+  homepageUrl: string | null;
+  defaultBranch: string | null;
+  createdAt: string | null;
+  pushedAt: string | null;
+  sizeKb: number | null;
+  visibility: string | null;
+  isArchived: boolean;
+  cloneUrl: string | null;
+  languages: RepositoryLanguage[];
 };
 
 export type RepositorySearchResult = {

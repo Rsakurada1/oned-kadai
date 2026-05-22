@@ -17,6 +17,25 @@ const repositories = new Map([
   ],
 ]);
 
+const repositoryLanguages = new Map([
+  [
+    "vercel/next.js",
+    {
+      JavaScript: 5_600_000,
+      TypeScript: 3_100_000,
+      Rust: 620_000,
+      CSS: 180_000,
+    },
+  ],
+  [
+    "facebook/react",
+    {
+      JavaScript: 4_800_000,
+      TypeScript: 240_000,
+    },
+  ],
+]);
+
 const server = createServer((request, response) => {
   const url = new URL(request.url ?? "/", `http://${request.headers.host}`);
 
@@ -31,7 +50,7 @@ const server = createServer((request, response) => {
   }
 
   if (url.pathname.startsWith("/repos/")) {
-    handleRepositoryDetail(url, response);
+    handleRepositoryRoute(url, response);
     return;
   }
 
@@ -81,12 +100,28 @@ function handleSearch(url: URL, response: Parameters<typeof sendJson>[0]) {
 /**
  * 一覧とは別に詳細 API を返し、実アプリと同じ再取得フローを検証できるようにする。
  */
-function handleRepositoryDetail(
+function handleRepositoryRoute(
   url: URL,
   response: Parameters<typeof sendJson>[0],
 ) {
-  const [, , owner, repo] = url.pathname.split("/").map(decodeURIComponent);
-  const repository = repositories.get(`${owner}/${repo}`);
+  const [, , owner, repo, subResource] = url.pathname
+    .split("/")
+    .map(decodeURIComponent);
+  const fullName = `${owner}/${repo}`;
+
+  if (subResource === "languages") {
+    const languages = repositoryLanguages.get(fullName);
+
+    if (!languages) {
+      sendJson(response, 404, { message: "Not Found" });
+      return;
+    }
+
+    sendJson(response, 200, languages);
+    return;
+  }
+
+  const repository = repositories.get(fullName);
 
   if (!repository) {
     sendJson(response, 404, { message: "Not Found" });
