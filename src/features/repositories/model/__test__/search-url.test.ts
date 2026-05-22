@@ -15,7 +15,6 @@ describe("createRepositorySearchUrl", () => {
           forks: 100,
           lowIssues: true,
           recentlyUpdated: true,
-          readme: true,
           sort: "stars",
           order: "asc",
           page: 2,
@@ -23,7 +22,25 @@ describe("createRepositorySearchUrl", () => {
         3,
       ),
     ).toBe(
-      "/?q=react+testing&languages=TypeScript%2CJavaScript&frameworks=React%2CNext.js&clouds=AWS&stars=100&forks=100&lowIssues=true&recentlyUpdated=true&readme=true&sort=stars&order=asc&page=3",
+      "/?q=react+testing&languages=TypeScript%2CJavaScript&frameworks=React%2CNext.js&clouds=AWS&stars=100&forks=100&lowIssues=true&recentlyUpdated=true&sort=stars&order=asc&page=3",
     );
+  });
+
+  it("drops sort-only state because sorting has no effect before a search", () => {
+    expect(
+      createRepositorySearchUrl({
+        q: "",
+        languages: [],
+        frameworks: [],
+        clouds: [],
+        stars: null,
+        forks: null,
+        lowIssues: false,
+        recentlyUpdated: false,
+        sort: "stars",
+        order: "desc",
+        page: 4,
+      }),
+    ).toBe("/");
   });
 });

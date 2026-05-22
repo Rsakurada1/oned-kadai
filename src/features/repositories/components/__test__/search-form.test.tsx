@@ -16,7 +16,6 @@ describe("SearchForm", () => {
           forks: 100,
           lowIssues: true,
           recentlyUpdated: true,
-          readme: true,
           sort: "stars",
           order: "desc",
           page: 1,
@@ -43,9 +42,10 @@ describe("SearchForm", () => {
     expect(screen.getByLabelText("Fork 下限")).toHaveValue(100);
     expect(screen.getByLabelText(/Issueが少ない/)).toBeChecked();
     expect(screen.getByLabelText(/最近更新された/)).toBeChecked();
-    expect(screen.getByLabelText(/READMEあり/)).toBeChecked();
+    expect(screen.queryByLabelText(/READMEあり/)).not.toBeInTheDocument();
     expect(container.querySelector('input[name="sort"]')).toHaveValue("stars");
     expect(container.querySelector('input[name="order"]')).toHaveValue("desc");
+    expect(container.querySelector(".search-panel__actions")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "検索" })).toBeInTheDocument();
   });
 
@@ -61,7 +61,6 @@ describe("SearchForm", () => {
           forks: null,
           lowIssues: false,
           recentlyUpdated: false,
-          readme: false,
           sort: "best-match",
           order: "desc",
           page: 1,
@@ -76,5 +75,51 @@ describe("SearchForm", () => {
     expect(form.getByLabelText("Star 下限")).toBeDisabled();
     expect(form.getByLabelText("Fork 条件を使う")).not.toBeChecked();
     expect(form.getByLabelText("Fork 下限")).toBeDisabled();
+  });
+
+  it("syncs metric threshold controls when URL-backed props change", () => {
+    const { container, rerender } = render(
+      <SearchForm
+        search={{
+          q: "",
+          languages: [],
+          frameworks: [],
+          clouds: [],
+          stars: null,
+          forks: null,
+          lowIssues: false,
+          recentlyUpdated: false,
+          sort: "best-match",
+          order: "desc",
+          page: 1,
+        }}
+      />,
+    );
+    const form = within(container);
+
+    expect(form.getByLabelText("Star 条件を使う")).not.toBeChecked();
+    expect(form.getByLabelText("Star 下限")).toBeDisabled();
+
+    rerender(
+      <SearchForm
+        search={{
+          q: "",
+          languages: [],
+          frameworks: [],
+          clouds: [],
+          stars: 250,
+          forks: null,
+          lowIssues: false,
+          recentlyUpdated: false,
+          sort: "best-match",
+          order: "desc",
+          page: 1,
+        }}
+      />,
+    );
+
+    expect(form.getByLabelText("Star 条件を使う")).toBeChecked();
+    expect(form.getByLabelText("Star 下限")).toBeEnabled();
+    expect(form.getByLabelText("Star 下限")).toHaveValue(250);
   });
 });

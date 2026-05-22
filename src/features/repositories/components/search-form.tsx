@@ -93,12 +93,14 @@ export function SearchForm({ search }: SearchFormProps) {
           <MetricThresholdRow
             defaultValue={search.stars ?? 100}
             enabled={search.stars !== null}
+            key={`stars-${search.stars ?? "off"}`}
             label="Star"
             name="stars"
           />
           <MetricThresholdRow
             defaultValue={search.forks ?? 100}
             enabled={search.forks !== null}
+            key={`forks-${search.forks ?? "off"}`}
             label="Fork"
             name="forks"
           />
@@ -116,13 +118,6 @@ export function SearchForm({ search }: SearchFormProps) {
             name="recentlyUpdated"
             value="true"
           />
-          <CheckboxRow
-            checked={search.readme}
-            hint="初期実装では検索条件に含めません"
-            label="READMEあり"
-            name="readme"
-            value="true"
-          />
         </div>
       </fieldset>
 
@@ -133,9 +128,11 @@ export function SearchForm({ search }: SearchFormProps) {
         </>
       ) : null}
 
-      <button className="button button--primary" type="submit">
-        検索
-      </button>
+      <div className="search-panel__actions">
+        <button className="button button--primary" type="submit">
+          検索
+        </button>
+      </div>
     </form>
   );
 }

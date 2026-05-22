@@ -1,5 +1,20 @@
 import { expect, test } from "@playwright/test";
 
+test("shows starter searches before any search has run", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(
+    page.getByRole("heading", { name: "条件を選んで検索してください" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("navigation", { name: "検索結果の並び替え" }),
+  ).toBeHidden();
+  await expect(page.getByRole("link", { name: "Next.js" })).toHaveAttribute(
+    "href",
+    "/?q=next&languages=TypeScript&page=1",
+  );
+});
+
 test("searches repositories and navigates to detail page", async ({ page }) => {
   await page.goto("/");
 

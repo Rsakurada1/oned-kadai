@@ -18,6 +18,7 @@ export function MetricThresholdRow({
   const inputId = useId();
   const checkboxId = useId();
   const [isEnabled, setIsEnabled] = useState(enabled);
+  const [value, setValue] = useState(String(defaultValue));
 
   return (
     <div className="threshold-row">
@@ -35,13 +36,14 @@ export function MetricThresholdRow({
         <input
           aria-label={`${label} 下限`}
           className="text-input threshold-row__number"
-          defaultValue={defaultValue}
           disabled={!isEnabled}
           id={inputId}
           min={0}
           name={isEnabled ? name : undefined}
+          onChange={(event) => setValue(event.target.value)}
           step={1}
           type="number"
+          value={value}
         />
         <span className="threshold-row__suffix">以上</span>
       </label>

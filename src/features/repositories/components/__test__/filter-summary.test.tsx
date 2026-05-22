@@ -16,7 +16,6 @@ describe("FilterSummary", () => {
           forks: 100,
           lowIssues: true,
           recentlyUpdated: true,
-          readme: true,
           sort: "stars",
           order: "desc",
           page: 2,
@@ -34,7 +33,6 @@ describe("FilterSummary", () => {
     expect(screen.getByText("Fork 100以上")).toBeInTheDocument();
     expect(screen.getByText("Issueが少ない")).toBeInTheDocument();
     expect(screen.getByText("最近更新された")).toBeInTheDocument();
-    expect(screen.getByText("READMEあり")).toBeInTheDocument();
     expect(screen.getByText("並び替え: stars")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "すべてリセット" })).toHaveAttribute(
       "href",
@@ -44,7 +42,7 @@ describe("FilterSummary", () => {
       screen.getByRole("link", { name: "言語: TypeScript を解除" }),
     ).toHaveAttribute(
       "href",
-      "/?q=react&languages=JavaScript&frameworks=React&clouds=AWS&stars=100&forks=100&lowIssues=true&recentlyUpdated=true&readme=true&sort=stars&order=desc&page=1",
+      "/?q=react&languages=JavaScript&frameworks=React&clouds=AWS&stars=100&forks=100&lowIssues=true&recentlyUpdated=true&sort=stars&order=desc&page=1",
     );
   });
 
@@ -60,7 +58,6 @@ describe("FilterSummary", () => {
           forks: null,
           lowIssues: false,
           recentlyUpdated: false,
-          readme: false,
           sort: "best-match",
           order: "desc",
           page: 1,

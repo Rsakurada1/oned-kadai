@@ -172,9 +172,25 @@ fieldset {
   font-size: 1.18rem;
 }
 
+.search-panel__actions {
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  margin: 0 -18px -18px;
+  border-top: 1px solid rgb(216 222 232 / 80%);
+  border-radius: 0 0 8px 8px;
+  padding: 12px 18px 18px;
+  background: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 82%) 0%,
+    #ffffff 36%
+  );
+}
+
 .search-panel__reset,
 .filter-summary__reset,
-.filter-chip a {
+.filter-chip a,
+.starter-link {
   color: var(--color-primary);
   font-weight: 800;
   text-underline-offset: 0.18em;
@@ -219,6 +235,7 @@ fieldset {
 .filter-summary__reset:focus-visible,
 .search-panel__reset:focus-visible,
 .sort-link:focus-visible,
+.starter-link:focus-visible,
 .checkbox-row:focus-within {
   outline: 3px solid rgb(35 87 198 / 30%);
   outline-offset: 3px;
@@ -420,6 +437,28 @@ fieldset {
   min-height: 36px;
   border-radius: 8px;
   padding: 7px 10px;
+}
+
+.starter-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.starter-link {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  border: 1px solid rgb(35 87 198 / 20%);
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  text-decoration: none;
+}
+
+.starter-link:hover {
+  border-color: rgb(35 87 198 / 42%);
+  background: #f7faff;
 }
 
 .section-heading p {

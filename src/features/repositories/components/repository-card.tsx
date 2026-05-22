@@ -72,7 +72,7 @@ export function RepositoryCard({
         aria-label={`${repository.fullName} の統計`}
       >
         <div className="repository-card__stat repository-card__stat--language">
-          <dt>Language</dt>
+          <dt>言語</dt>
           <dd>
             <span
               className="repository-card__language-dot"
@@ -82,19 +82,19 @@ export function RepositoryCard({
           </dd>
         </div>
         <div className="repository-card__stat repository-card__stat--metric repository-card__stat--stars">
-          <dt>Stars</dt>
+          <dt>Star</dt>
           <dd>{repository.stars.toLocaleString()}</dd>
         </div>
         <div className="repository-card__stat repository-card__stat--metric repository-card__stat--forks">
-          <dt>Forks</dt>
+          <dt>Fork</dt>
           <dd>{repository.forks.toLocaleString()}</dd>
         </div>
         <div className="repository-card__stat repository-card__stat--subtle">
-          <dt>Issues</dt>
+          <dt>Issue</dt>
           <dd>{repository.openIssues.toLocaleString()}</dd>
         </div>
         <div className="repository-card__stat repository-card__stat--subtle">
-          <dt>Updated</dt>
+          <dt>更新日</dt>
           <dd>{formatDate(repository.updatedAt)}</dd>
         </div>
       </dl>

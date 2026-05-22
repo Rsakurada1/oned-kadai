@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  hasSearchCriteria,
   normalizeForkThreshold,
   normalizeOrder,
   normalizePage,
@@ -21,7 +20,6 @@ describe("parseSearchParams", () => {
       forks: null,
       lowIssues: false,
       recentlyUpdated: false,
-      readme: false,
       sort: "best-match",
       order: "desc",
       page: 3,
@@ -53,7 +51,6 @@ describe("parseSearchParams", () => {
       forks: 100,
       lowIssues: true,
       recentlyUpdated: true,
-      readme: true,
       sort: "stars",
       order: "asc",
       page: 2,
@@ -70,32 +67,10 @@ describe("parseSearchParams", () => {
       forks: null,
       lowIssues: false,
       recentlyUpdated: false,
-      readme: false,
       sort: "best-match",
       order: "desc",
       page: 1,
     });
-  });
-});
-
-describe("hasSearchCriteria", () => {
-  it("ignores README-only state because it is a future filter", () => {
-    expect(
-      hasSearchCriteria({
-        q: "",
-        languages: [],
-        frameworks: [],
-        clouds: [],
-        stars: null,
-        forks: null,
-        lowIssues: false,
-        recentlyUpdated: false,
-        readme: true,
-        sort: "best-match",
-        order: "desc",
-        page: 1,
-      }),
-    ).toBe(false);
   });
 });
 

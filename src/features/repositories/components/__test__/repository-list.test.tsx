@@ -21,7 +21,6 @@ describe("RepositoryList", () => {
           forks: null,
           lowIssues: false,
           recentlyUpdated: false,
-          readme: false,
           sort: "stars",
           order: "desc",
           page: 2,

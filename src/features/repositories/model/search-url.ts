@@ -1,4 +1,5 @@
 import type { RepositorySearchParams } from "./search-params";
+import { hasSearchCriteria } from "./search-state";
 
 /** 検索状態から共有可能な URL を作ります。filter chip、sort link、pagination で共通利用します。 */
 export function createRepositorySearchUrl(
@@ -20,6 +21,7 @@ export function createRepositorySearchUrlParams(
   page = search.page,
 ): URLSearchParams {
   const params = new URLSearchParams();
+  const hasCriteria = hasSearchCriteria(search);
 
   if (search.q) {
     params.set("q", search.q);
@@ -45,16 +47,12 @@ export function createRepositorySearchUrlParams(
     params.set("recentlyUpdated", "true");
   }
 
-  if (search.readme) {
-    params.set("readme", "true");
-  }
-
-  if (search.sort !== "best-match") {
+  if (hasCriteria && search.sort !== "best-match") {
     params.set("sort", search.sort);
     params.set("order", search.order);
   }
 
-  if (hasAnySearchState(search)) {
+  if (hasCriteria) {
     params.set("page", String(page));
   }
 
@@ -69,18 +67,4 @@ function setCsvParam(
   if (values.length > 0) {
     params.set(name, values.join(","));
   }
-}
-
-function hasAnySearchState(search: RepositorySearchParams): boolean {
-  return Boolean(
-    search.q ||
-      search.languages.length > 0 ||
-      search.frameworks.length > 0 ||
-      search.clouds.length > 0 ||
-      search.stars !== null ||
-      search.forks !== null ||
-      search.lowIssues ||
-      search.recentlyUpdated ||
-      search.readme,
-  );
 }

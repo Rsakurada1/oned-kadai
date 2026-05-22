@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { EmptyState } from "@/features/repositories/components/empty-state";
 import { ErrorMessage } from "@/features/repositories/components/error-message";
 import { FilterSummary } from "@/features/repositories/components/filter-summary";
@@ -9,11 +11,11 @@ import { SearchStatusAnnouncer } from "@/features/repositories/components/search
 import { SortLinks } from "@/features/repositories/components/sort-links";
 import { StickySearchSidebar } from "@/features/repositories/components/sticky-search-sidebar";
 import {
-  hasSearchCriteria,
   parseSearchParams,
   type RepositorySearchParams,
   type RawSearchParams,
 } from "@/features/repositories/model/search-params";
+import { hasSearchCriteria } from "@/features/repositories/model/search-state";
 import { searchRepositories } from "@/features/repositories/services/search-repositories";
 import { classifyGitHubError } from "@/lib/github/errors";
 
@@ -27,6 +29,7 @@ const PER_PAGE = 20;
 export default async function HomePage({ searchParams }: HomePageProps) {
   const sp = await searchParams;
   const search = parseSearchParams(sp);
+  const hasCriteria = hasSearchCriteria(search);
 
   return (
     <div className="repository-search-page">
@@ -40,9 +43,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <SearchForm search={search} />
         </StickySearchSidebar>
         <section className="search-layout__results" aria-label="検索結果">
-          <SortLinks search={search} />
-          <FilterSummary search={search} />
-          {hasSearchCriteria(search) ? (
+          {hasCriteria ? (
+            <>
+              <SortLinks search={search} />
+              <FilterSummary search={search} />
+            </>
+          ) : null}
+          {hasCriteria ? (
             await renderSearchResult(search)
           ) : (
             <InitialSearchState />
@@ -58,8 +65,25 @@ function InitialSearchState() {
     <section className="empty-state">
       <h2>条件を選んで検索してください</h2>
       <p>
-        左の検索条件からキーワード、言語、フレームワーク、クラウド、こだわり条件を選ぶと、公開リポジトリをカード形式で表示します。
+        キーワードや技術スタックを指定すると、公開リポジトリをカード形式で表示します。
       </p>
+      <div aria-label="検索例" className="starter-links">
+        <Link className="starter-link" href="/?q=next&languages=TypeScript&page=1">
+          Next.js
+        </Link>
+        <Link className="starter-link" href="/?languages=TypeScript&page=1">
+          TypeScript
+        </Link>
+        <Link
+          className="starter-link"
+          href="/?frameworks=React&stars=100&page=1"
+        >
+          React / Star 100+
+        </Link>
+        <Link className="starter-link" href="/?recentlyUpdated=true&page=1">
+          最近更新
+        </Link>
+      </div>
     </section>
   );
 }

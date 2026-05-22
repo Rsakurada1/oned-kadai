@@ -1,4 +1,5 @@
 import type { RepositorySearchParams } from "../model/search-params";
+import { createSearchFilterLabels } from "../model/search-state";
 
 type EmptyStateProps = {
   search: RepositorySearchParams;
@@ -8,7 +9,7 @@ type EmptyStateProps = {
  * 0 件時に現在の条件を明示し、次に試せる調整案を同じ画面内で提示する。
  */
 export function EmptyState({ search }: EmptyStateProps) {
-  const filters = createFilterLabels(search);
+  const filters = createSearchFilterLabels(search);
 
   return (
     <section aria-labelledby="empty-state-heading" className="empty-state">
@@ -28,18 +29,4 @@ export function EmptyState({ search }: EmptyStateProps) {
       </ul>
     </section>
   );
-}
-
-function createFilterLabels(search: RepositorySearchParams): string[] {
-  return [
-    search.q ? `キーワード: ${search.q}` : null,
-    ...search.languages.map((language) => `言語: ${language}`),
-    ...search.frameworks.map((framework) => `FW: ${framework}`),
-    ...search.clouds.map((cloud) => `Cloud: ${cloud}`),
-    search.stars !== null ? `Star ${search.stars}以上` : null,
-    search.forks !== null ? `Fork ${search.forks}以上` : null,
-    search.lowIssues ? "Issueが少ない" : null,
-    search.recentlyUpdated ? "最近更新された" : null,
-    search.readme ? "READMEあり" : null,
-  ].filter((label): label is string => Boolean(label));
 }

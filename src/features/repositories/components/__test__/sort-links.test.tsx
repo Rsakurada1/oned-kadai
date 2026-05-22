@@ -16,7 +16,6 @@ describe("SortLinks", () => {
           forks: null,
           lowIssues: false,
           recentlyUpdated: false,
-          readme: false,
           sort: "best-match",
           order: "desc",
           page: 1,

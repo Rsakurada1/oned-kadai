@@ -15,7 +15,6 @@ export type RepositorySearchParams = {
   forks: ForkThreshold | null;
   lowIssues: boolean;
   recentlyUpdated: boolean;
-  readme: boolean;
   sort: RepositorySearchSort;
   order: RepositorySearchOrder;
   page: number;
@@ -48,24 +47,10 @@ export function parseSearchParams(
     forks: normalizeForkThreshold(searchParams.forks),
     lowIssues: normalizeBooleanParam(searchParams.lowIssues),
     recentlyUpdated: normalizeBooleanParam(searchParams.recentlyUpdated),
-    readme: normalizeBooleanParam(searchParams.readme),
     sort: normalizeSort(firstValue(searchParams.sort)),
     order: normalizeOrder(firstValue(searchParams.order)),
     page: normalizePage(firstValue(searchParams.page)),
   };
-}
-
-export function hasSearchCriteria(search: RepositorySearchParams): boolean {
-  return Boolean(
-    search.q ||
-      search.languages.length > 0 ||
-      search.frameworks.length > 0 ||
-      search.clouds.length > 0 ||
-      search.stars !== null ||
-      search.forks !== null ||
-      search.lowIssues ||
-      search.recentlyUpdated,
-  );
 }
 
 /** page は 1 始まりに固定し、不正値や小数は安全な値へ丸めます。 */
