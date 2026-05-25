@@ -35,18 +35,30 @@ export function RepositoryDetail({
           unoptimized
           width={72}
         />
-        <div>
+        <div className="repository-detail__heading">
           <p className="repository-detail__owner">{repository.ownerLogin}</p>
           <div className="repository-detail__title-row">
             <h1>{repository.fullName}</h1>
-            <a
-              className="button button--secondary"
-              href={repository.htmlUrl}
-              rel="noreferrer"
-              target="_blank"
-            >
-              GitHubで開く
-            </a>
+            <div className="repository-detail__actions">
+              <a
+                className="button button--secondary"
+                href={repository.htmlUrl}
+                rel="noreferrer"
+                target="_blank"
+              >
+                GitHubで開く
+              </a>
+              {repository.homepageUrl ? (
+                <a
+                  className="button button--secondary"
+                  href={repository.homepageUrl}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  公式サイトを開く
+                </a>
+              ) : null}
+            </div>
           </div>
         </div>
       </header>
@@ -179,33 +191,12 @@ export function RepositoryDetail({
           className="detail-section"
         >
           <div className="section-heading">
-            <h2 id="repository-clone-heading">Clone</h2>
+            <h2 id="repository-clone-heading">クローン</h2>
           </div>
           <CloneCommandPanel
             httpsUrl={repository.cloneUrl}
             sshUrl={repository.sshUrl}
           />
-        </section>
-      ) : null}
-
-      {repository.homepageUrl ? (
-        <section
-          aria-labelledby="repository-links-heading"
-          className="detail-section"
-        >
-          <div className="section-heading">
-            <h2 id="repository-links-heading">関連リンク</h2>
-          </div>
-          <div className="detail-actions">
-            <a
-              className="button button--secondary"
-              href={repository.homepageUrl}
-              rel="noreferrer"
-              target="_blank"
-            >
-              公式サイトを開く
-            </a>
-          </div>
         </section>
       ) : null}
 

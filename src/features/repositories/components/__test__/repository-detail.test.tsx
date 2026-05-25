@@ -42,5 +42,8 @@ describe("RepositoryDetail", () => {
     expect(
       screen.getByRole("link", { name: "公式サイトを開く" }),
     ).toHaveAttribute("href", "https://nextjs.org");
+    expect(
+      screen.queryByRole("heading", { name: "関連リンク" }),
+    ).not.toBeInTheDocument();
   });
 });

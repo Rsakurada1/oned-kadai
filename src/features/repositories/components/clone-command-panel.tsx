@@ -39,7 +39,7 @@ export function CloneCommandPanel({
       </div>
 
       <fieldset className="clone-command">
-        <legend>Clone command</legend>
+        <legend>clone command</legend>
         <div className="protocol-switch">
           <button
             aria-pressed={protocol === "https"}
@@ -64,7 +64,7 @@ export function CloneCommandPanel({
           <code>{cloneCommand}</code>
           <button
             className="button button--secondary copy-button"
-            onClick={() => copyText(cloneCommand, "Clone command")}
+            onClick={() => copyText(cloneCommand, "clone command")}
             type="button"
           >
             コマンドをコピー
@@ -81,7 +81,7 @@ export function CloneCommandPanel({
   async function copyText(value: string, label: string) {
     try {
       await navigator.clipboard.writeText(value);
-      setCopyStatus(`${label} をコピーしました。`);
+      setCopyStatus(`${label}をコピーしました。`);
     } catch {
       setCopyStatus("クリップボードにコピーできませんでした。");
     }
